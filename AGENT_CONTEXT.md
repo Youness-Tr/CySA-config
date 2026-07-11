@@ -1,5 +1,5 @@
 # CySA Atlas — Full Infrastructure Context Prompt
-*Last verified: 2026-07-11 18:30 UTC — Live diagnostics run on Azure VM*
+*Last verified: 2026-07-11 18:50 UTC — Live diagnostics run on Azure VM*
 
 You are an AI assistant helping build **CySA Atlas**, a full-stack open-source Security Operations Center (SOC) platform. Below is the complete picture of what we are building, the current verified state, the architecture, and all technical details. Use this as your ground truth for every decision.
 
@@ -12,6 +12,8 @@ CySA Atlas is a custom SOC platform consisting of:
 - A **SOAR** (Security Orchestration, Automation and Response) layer — Shuffle
 - **Case Management** (incident tracking) — TheHive 5
 - A **custom web platform** (Next.js frontend + NestJS backend) that consumes all services via REST APIs and presents a unified SOC dashboard
+
+> **KEY DECISION**: The custom Next.js + NestJS platform runs on the **developer's local machine**, NOT on the Azure VM. The Azure VM only hosts the backend SOC services (Wazuh, Shuffle, TheHive). The Wazuh Dashboard is NOT needed — our custom frontend replaces it.
 
 The platform is designed for a CySA+ (CompTIA Cybersecurity Analyst) training and real-world SOC simulation environment.
 
@@ -90,7 +92,7 @@ wazuh.dashboard              → NOT RUNNING ❌ (needs to be added back)
 :514   → Syslog (UDP)
 :55000 → Wazuh Manager REST API (HTTPS + JWT auth)  ✅ WORKING
 :9200  → Wazuh Indexer (OpenSearch, HTTPS + basic auth)  ✅ WORKING
-:443   → Wazuh Dashboard (HTTPS) ❌ NOT RESPONDING (container missing)
+:443   → Wazuh Dashboard — NOT NEEDED (custom frontend replaces it)
 ```
 
 ### HTTP Proxy (cysa-proxy container):
@@ -172,18 +174,38 @@ email_1-3-0            2/2 replicas  :33337
 http_1-4-0             2/2 replicas  :33338
 ```
 
-### Credentials:
+### Credentials (VERIFIED 2026-07-11):
 ```
-Shuffle UI: http://20.91.141.211:3002 (login via browser, set up first time)
-Shuffle Backend: http://20.91.141.211:3001
-API Key: retrieve from Shuffle UI profile settings after login
-Admin user: admin@cysa.local (verified from logs)
+Shuffle UI:       http://20.91.141.211:3002
+Shuffle Backend:  http://20.91.141.211:3001
+Admin username:   admin@cysa.local
+Admin user ID:    6db5b1f4-e533-4612-bb25-cbd7afa5ba1f
+API Key:          b2f9fca5-16ca-4e66-a03e-bc80f59f05c4   ← VERIFIED from OpenSearch DB
+Org ID:           7703d9c5-fed2-44aa-ab8f-ec197d52c79d
 ```
 
-### Playbook Status:
-- 5 workflows loaded in Shuffle
-- Workflow ID: 7faedd29-cc92-4759-809a-6fe150e0631c (from original — verify in UI)
-- Shuffle→TheHive case creation: NOT YET BUILT ❌
+### Webhook (Wazuh → Shuffle):
+```
+Webhook ID:  b76d3576-f033-47a3-8731-e8ad8aa62942
+Webhook URL: http://20.91.141.211:3002/api/v1/hooks/webhook_b76d3576-f033-47a3-8731-e8ad8aa62942
+Status:      running ✅  (frontend proxies to backend correctly)
+In ossec.conf: ✅ ALREADY CONFIGURED — Wazuh sends all level>=3 alerts here
+```
+
+### Workflow Status (VERIFIED):
+```
+Workflow [40642101-1eea-4b86-b1b7-f88404f3b5d5]:
+  Name: CySA Atlas - SOAR Sync Test
+  Status: test (stub)
+  Trigger: Webhook b76d3576 → running ✅ (receives Wazuh alerts)
+  Action: HTTP POST → https://office-finger-issue-incl.trycloudflare.com  ← STALE CLOUDFLARE TUNNEL
+  Executions: 16 total, recent ones FINISHED
+  
+NEEDS FIX:
+  - The POST action URL must point to NestJS backend /api/v1/soar/sync
+  - Need to add proper alert routing logic (vulnerability/FIM/network classification)
+  - Need to add TheHive case creation action
+```
 
 ---
 
@@ -266,7 +288,7 @@ tenzir-node → tenzir/tenzir:main  ✅ Up (2h)
 ### Location: CySA-Atlas/ (Git repo — on developer machine)
 ### Status: NOT YET TESTED against Azure (NestJS .env not filled in)
 
-### Backend .env values needed:
+### Backend .env values (COMPLETE — use these):
 ```dotenv
 PORT=4000
 WAZUH_API_BASE_URL=https://20.91.141.211:55000
@@ -278,7 +300,7 @@ WAZUH_INDEXER_PASSWORD=SecretPassword
 THEHIVE_URL=http://20.91.141.211:9003
 THEHIVE_API_KEY=5icIawuRoHIgT52C87umiCZ8gidV8lZf
 SHUFFLE_URL=http://20.91.141.211:3001
-SHUFFLE_API_KEY=<get from Shuffle UI>
+SHUFFLE_API_KEY=b2f9fca5-16ca-4e66-a03e-bc80f59f05c4
 DB_HOST=platform-db
 DB_PORT=5432
 DB_USERNAME=postgres
@@ -289,7 +311,12 @@ DB_NAME=platform
 ### IMPORTANT — TLS on Azure:
 - Wazuh Indexer uses HTTPS with self-signed certs
 - NestJS must use `httpsAgent({ rejectUnauthorized: false })` for ALL Wazuh calls
-- Or use the proxy ports: :9201 (indexer HTTP) and :55001 (API HTTP)
+- OR use the proxy ports: :9201 (indexer HTTP) and :55001 (API HTTP) — no TLS needed
+
+### NestJS backend is on DEVELOPER'S LOCAL MACHINE, not on Azure VM.
+- Azure VM does NOT run the NestJS backend (:4000 is NOT open on Azure)
+- The Shuffle workflow POST action must point to wherever NestJS is reachable from Azure
+  (use ngrok / cloudflare tunnel / or deploy NestJS to Azure when ready)
 
 ---
 
@@ -378,64 +405,78 @@ shuffle_swarm_executions  → swarm overlay (shuffle workers)
 
 ## MASTER ROADMAP
 
-### 🔴 PHASE 0 — Foundation Fixes (CURRENT PRIORITY)
-- [ ] 0.1 Recreate all docker-compose.yml files and commit to git
-- [ ] 0.2 Bring up Wazuh Dashboard container (add to wazuh compose)
-- [ ] 0.3 Create deploy.sh script
-- [ ] 0.4 Resolve Tenzir :1514 port conflict with Wazuh
-- [ ] 0.5 Clean up dead containers and legacy directories
+### 🔴 PHASE 1 — SOAR Pipeline (CURRENT PRIORITY)
+*Wazuh → Shuffle → TheHive full automation*
 
-### 🟡 PHASE 1 — SIEM Activation
-- [ ] 1.1 Configure ossec.conf — enable FIM (syscheck) with real paths
-- [ ] 1.2 Configure ossec.conf — enable Vulnerability Detection
-- [ ] 1.3 Add custom rules in local_rules.xml
-- [ ] 1.4 Enroll first Wazuh agent (on Azure VM itself)
-- [ ] 1.5 Verify FIM + CVE alerts in OpenSearch
+- [ ] 1.1 Fix Shuffle workflow: replace stale Cloudflare URL with NestJS backend URL
+- [ ] 1.2 Add alert classification logic in Shuffle (vulnerability / FIM / network_attack)
+- [ ] 1.3 Add TheHive case creation action in Shuffle workflow
+- [ ] 1.4 Commit ossec.conf + local_rules.xml to CySA-config git repo
+- [ ] 1.5 Test end-to-end: trigger alert → Shuffle runs → TheHive case created
 
-### 🟡 PHASE 2 — SOAR Pipeline
-- [ ] 2.1 Build Shuffle workflow: Wazuh webhook → alert routing
-- [ ] 2.2 Configure Shuffle → TheHive case creation
-- [ ] 2.3 Test end-to-end: alert → Shuffle → TheHive case
-- [ ] 2.4 Build NestJS SOAR sync endpoint
+### 🟡 PHASE 2 — SIEM Data Enrichment
+*Get real data flowing (no agents needed for server-level monitoring)*
 
-### 🟢 PHASE 3 — CySA Atlas Platform (Frontend + Backend)
-- [ ] 3.1 Fill NestJS backend .env with Azure credentials
-- [ ] 3.2 Implement httpsAgent for Wazuh TLS calls
-- [ ] 3.3 Test all /api/v1/* endpoints
-- [ ] 3.4 Build SOC Dashboard UI in Next.js
+- [ ] 2.1 Harden ossec.conf: add more FIM paths, tune alert levels
+- [ ] 2.2 Add meaningful custom rules in local_rules.xml
+- [ ] 2.3 Enroll first Wazuh agent (Azure VM itself or a test endpoint)
+- [ ] 2.4 Verify FIM + CVE alerts flowing into OpenSearch
 
-### 🔵 PHASE 4 — Advanced Modules (Future)
+### 🟢 PHASE 3 — NestJS Backend Integration
+*Wire local backend to all Azure services*
+
+- [ ] 3.1 Set NestJS backend .env with all Azure credentials (values are KNOWN — see above)
+- [ ] 3.2 Implement httpsAgent (rejectUnauthorized: false) for all Wazuh calls
+- [ ] 3.3 Test all /api/v1/* endpoints: wazuh, fim, vulnerability, soar
+- [ ] 3.4 Update Shuffle workflow POST URL to point to local NestJS (via tunnel or deploy)
+
+### 🟢 PHASE 4 — Next.js Frontend
+*Build the unified SOC Dashboard UI*
+
+- [ ] 4.1 Connect Next.js to NestJS API
+- [ ] 4.2 Build Agents Status panel
+- [ ] 4.3 Build Security Alerts panel
+- [ ] 4.4 Build FIM / Vulnerability panels
+- [ ] 4.5 Build SOAR Events panel
+- [ ] 4.6 Build TheHive Cases panel
+
+### 🔵 PHASE 5 — Advanced Modules (Future)
 - MISP (Threat Intel) → :443
 - OpenCTI (ATT&CK) → :8080
 - Sigma + Jupyter (Threat Hunting) → :8888
 - Python ML UEBA (scikit-learn, Isolation Forest)
 - Velociraptor (Digital Forensics) → :8889
 - CAPE Sandbox (Malware) → :8000
+- Resolve Tenzir port :1514 conflict with Wazuh agents (when agents are deployed)
 
 ---
 
-## CURRENT STATUS (VERIFIED 2026-07-11)
+## CURRENT STATUS (VERIFIED 2026-07-11 18:50 UTC)
 
 ### ✅ WORKING:
-- Wazuh Manager + Indexer (4.14.5) — API auth working, OpenSearch GREEN, 194 alerts
-- Shuffle full stack (backend + frontend + orborus + swarm app workers)
-- TheHive + Cassandra + MinIO — login verified, API key: 5icIawuRoHIgT52C87umiCZ8gidV8lZf
-- Cysa-proxy Nginx — stripping TLS for Wazuh services at :9201 and :55001
-- Docker Swarm single-node manager active
+- Wazuh Manager + Indexer (4.14.5) — API auth ✅, OpenSearch GREEN ✅, 194 alerts
+- Wazuh ossec.conf — FIM (syscheck) ✅ enabled, Vuln Detection ✅ enabled, Shuffle integration ✅ configured
+- Wazuh → Shuffle webhook — ✅ LIVE (Wazuh sends level>=3 alerts to Shuffle webhook)
+- Shuffle full stack — backend ✅, frontend ✅, orborus ✅, 6 swarm app services ✅
+- Shuffle webhook (b76d3576) — ✅ running, receives alerts, triggers workflow
+- Shuffle API key — ✅ b2f9fca5-16ca-4e66-a03e-bc80f59f05c4
+- TheHive + Cassandra + MinIO — ✅ login works, API key: 5icIawuRoHIgT52C87umiCZ8gidV8lZf
+- Cysa-proxy Nginx — ✅ :9201 (indexer HTTP) and :55001 (API HTTP)
+- Docker Swarm — ✅ single-node manager active
 
-### ❌ BROKEN / MISSING:
-- Wazuh Dashboard container — NOT RUNNING (port :443 dead)
-- docker-compose.yml files — MISSING FROM DISK (need recreate + git commit)
-- Wazuh agents — NONE enrolled (only built-in manager agent 000)
-- FIM (syscheck) — NOT CONFIGURED (0 FIM alerts)
-- Vulnerability scanning — NOT CONFIGURED (0 CVEs)
-- Shuffle→TheHive workflow — NOT BUILT
-- NestJS backend .env — NOT CONFIGURED for Azure IPs
-- Tenzir port :1514 — POTENTIAL CONFLICT with Wazuh agent port
+### ❌ BROKEN / NEEDS FIX:
+- Shuffle workflow POST action — ❌ pointing to STALE Cloudflare tunnel URL, needs NestJS backend URL
+- Shuffle→TheHive case creation — ❌ not wired in the workflow yet
+- Alert routing logic — ❌ no classification (vulnerability / FIM / network_attack) in workflow
+- Wazuh agents — ⏳ DEFERRED (intentional — no agents enrolled yet)
+- NestJS backend .env — needs filling in on developer machine (values known, see above)
+- Tenzir port :1514 — ⏳ DEFERRED (check conflict when agents deployed)
 
-### 🎯 IMMEDIATE NEXT TASK (Phase 0.1 + 0.2):
-Recreate Wazuh docker-compose.yml (with dashboard container) and commit to git.
-Then bring up the dashboard so Wazuh is fully operational.
+### 🎯 IMMEDIATE NEXT TASK (Phase 1.1 → 1.3):
+Fix the Shuffle workflow:
+1. Update POST action URL to point to NestJS backend /api/v1/soar/sync
+2. Add alert type classification logic
+3. Add TheHive case creation action
 
 ---
 
