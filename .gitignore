@@ -1,0 +1,24 @@
+# Runtime data
+logs/
+data/
+backups/
+
+# TheHive
+thehive/cassandra/
+thehive/minio/
+
+# Docker volumes
+**/data/
+**/logs/
+**/*.db
+**/*.log
+
+# Python
+__pycache__/
+*.pyc
+
+# VSCode
+.vscode/
+
+# OS
+.DS_Store
