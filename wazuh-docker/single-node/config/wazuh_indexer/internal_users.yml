@@ -4,7 +4,7 @@ _meta:
   config_version: 2
 
 admin:
-  hash: "$2y$12$K/SpwjtB.wOHJ/Nc6GVpDOzv74Yas6MC65RL8xQQmHCG0aLXr3JKO"
+  hash: "$2b$12$cK3Fkh3Y3QxpsWX.0nFokuapOnoWuN3.OC2vLezrgjV5.m2RoTMO."
   reserved: true
   backend_roles:
   - "admin"

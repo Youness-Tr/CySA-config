@@ -24,7 +24,7 @@
         },
         {
           "name": "body",
-          "value": "$exec",
+          "value": "{\"event_type\": \"network_attack\", \"identifier\": \"$exec.agent.id\", \"score\": $exec.rule.level, \"target_host\": \"$exec.agent.name\", \"remediation_status\": \"open\"}",
           "variant": "STATIC_VALUE",
           "required": false
         },
@@ -41,9 +41,17 @@
           "required": false
         }
       ],
-      "position": {"x": 450.0, "y": 400.0},
+      "position": {
+        "x": 450.0,
+        "y": 400.0
+      },
       "environment": "onprem",
-      "execution_variable": {"description": "", "id": "", "name": "", "value": ""}
+      "execution_variable": {
+        "description": "",
+        "id": "",
+        "name": "",
+        "value": ""
+      }
     },
     {
       "app_name": "http",
@@ -70,7 +78,7 @@
         },
         {
           "name": "body",
-          "value": "$exec",
+          "value": "{\"type\": \"wazuh\", \"source\": \"Wazuh SIEM\", \"sourceRef\": \"wazuh-$exec.id\", \"title\": \"[Rule $exec.rule.id] $exec.rule.description\", \"description\": \"Agent: $exec.agent.name ($exec.agent.ip) | Level: $exec.rule.level\", \"severity\": 2, \"tags\": [\"wazuh\", \"siem\", \"automated\"]}",
           "variant": "STATIC_VALUE",
           "required": false
         },
@@ -81,9 +89,17 @@
           "required": false
         }
       ],
-      "position": {"x": 750.0, "y": 400.0},
+      "position": {
+        "x": 750.0,
+        "y": 400.0
+      },
       "environment": "onprem",
-      "execution_variable": {"description": "", "id": "", "name": "", "value": ""}
+      "execution_variable": {
+        "description": "",
+        "id": "",
+        "name": "",
+        "value": ""
+      }
     }
   ],
   "triggers": [
@@ -97,10 +113,19 @@
       "name": "Webhook",
       "trigger_type": "WEBHOOK",
       "parameters": [
-        {"name": "url", "value": "http://20.91.141.211:3002/api/v1/hooks/webhook_b76d3576-f033-47a3-8731-e8ad8aa62942"},
-        {"name": "await_response", "value": "v1"}
+        {
+          "name": "url",
+          "value": "http://20.91.141.211:3002/api/v1/hooks/webhook_b76d3576-f033-47a3-8731-e8ad8aa62942"
+        },
+        {
+          "name": "await_response",
+          "value": "v1"
+        }
       ],
-      "position": {"x": 150.0, "y": 400.0},
+      "position": {
+        "x": 150.0,
+        "y": 400.0
+      },
       "status": "running",
       "replacement_for_trigger": ""
     }
@@ -110,15 +135,24 @@
       "destination_id": "7ad495bf-0d59-419f-bf60-4343cb084d4b",
       "id": "41b355cd-aca5-4bb9-b8eb-46a29ff34db8",
       "source_id": "b76d3576-f033-47a3-8731-e8ad8aa62942",
-      "label": "", "has_errors": false, "conditions": null, "decorator": false
+      "label": "",
+      "has_errors": false,
+      "conditions": null,
+      "decorator": false
     },
     {
       "destination_id": "create_thehive_alert",
       "id": "branch_nestjs_to_thehive",
       "source_id": "7ad495bf-0d59-419f-bf60-4343cb084d4b",
-      "label": "", "has_errors": false, "conditions": null, "decorator": false
+      "label": "",
+      "has_errors": false,
+      "conditions": null,
+      "decorator": false
     }
   ],
-  "execution_org": {"name": "default", "id": "7703d9c5-fed2-44aa-ab8f-ec197d52c79d"},
+  "execution_org": {
+    "name": "default",
+    "id": "7703d9c5-fed2-44aa-ab8f-ec197d52c79d"
+  },
   "previously_saved": true
 }

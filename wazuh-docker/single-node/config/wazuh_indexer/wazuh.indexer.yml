@@ -4,11 +4,11 @@ node.name: "node-1"
 cluster.initial_master_nodes:
 - "node-1"
 
-plugins.security.ssl.http.pemcertfile: /usr/share/wazuh-indexer/config/certs/wazuh.indexer.pem
-plugins.security.ssl.http.pemkeyfile: /usr/share/wazuh-indexer/config/certs/wazuh.indexer.key
+plugins.security.ssl.http.pemcert_filepath: /usr/share/wazuh-indexer/config/certs/wazuh.indexer.pem
+plugins.security.ssl.http.pemkey_filepath: /usr/share/wazuh-indexer/config/certs/wazuh.indexer.key
 plugins.security.ssl.http.pemtrustedcas_filepath: /usr/share/wazuh-indexer/config/certs/root-ca.pem
-plugins.security.ssl.transport.pemcertfile: /usr/share/wazuh-indexer/config/certs/wazuh.indexer.pem
-plugins.security.ssl.transport.pemkeyfile: /usr/share/wazuh-indexer/config/certs/wazuh.indexer.key
+plugins.security.ssl.transport.pemcert_filepath: /usr/share/wazuh-indexer/config/certs/wazuh.indexer.pem
+plugins.security.ssl.transport.pemkey_filepath: /usr/share/wazuh-indexer/config/certs/wazuh.indexer.key
 plugins.security.ssl.transport.pemtrustedcas_filepath: /usr/share/wazuh-indexer/config/certs/root-ca.pem
 plugins.security.ssl.http.enabled: true
 plugins.security.ssl.transport.enforce_hostname_verification: false
