@@ -463,7 +463,9 @@ shuffle_swarm_executions  → swarm overlay (shuffle workers)
 - TheHive + Cassandra + MinIO — ✅ login works, SOC org created, integration user API key: 5WPuhetgYO5E0wp1mc6aAc0S44n4uAuZ
 - Cysa-proxy Nginx — ✅ :9201 (indexer HTTP) and :55001 (API HTTP) (auto-injecting correct basic auth header)
 - Docker Swarm — ✅ single-node manager active
-- Shuffle SOAR Pipeline — ✅ FULLY OPERATIONAL. Tests confirm webhook triggers → NestJS POST `/api/v1/soar/sync` (returns 201) → TheHive Alert `/api/v1/alert` (returns 201).
+- Shuffle SOAR Pipeline — ✅ FULLY OPERATIONAL. Webhook triggers → NestJS POST `/api/v1/soar/sync` (returns 201) → TheHive Alert `/api/v1/alert` (returns 201) → Promote Alert to Case `/api/v1/alert/{id}/case` (returns 201).
+- TheHive Webhook — ✅ CONFIGURED. Forwarding Case/Alert events internally to Shuffle endpoint (`a15dc028-1897-40a3-af76-9ce8290c9d15`).
+
 
 ### ❌ BROKEN / NEEDS FIX:
 - Wazuh agents — ⏳ DEFERRED (intentional — no agents enrolled yet)
