@@ -1,0 +1,124 @@
+{
+  "id": "40642101-1eea-4b86-b1b7-f88404f3b5d5",
+  "name": "CySA Atlas - Wazuh SOAR Pipeline",
+  "description": "Wazuh alert (raw) -> NestJS SOAR sync -> TheHive Alert. NestJS handles classification.",
+  "status": "production",
+  "org_id": "7703d9c5-fed2-44aa-ab8f-ec197d52c79d",
+  "actions": [
+    {
+      "app_name": "http",
+      "app_version": "1.4.0",
+      "app_id": "",
+      "errors": null,
+      "id": "7ad495bf-0d59-419f-bf60-4343cb084d4b",
+      "is_valid": true,
+      "isStartNode": true,
+      "label": "POST to NestJS SOAR",
+      "name": "POST",
+      "parameters": [
+        {
+          "name": "url",
+          "value": "https://kingston-alpine-cloth-grade.trycloudflare.com/api/v1/soar/sync",
+          "variant": "STATIC_VALUE",
+          "required": true
+        },
+        {
+          "name": "body",
+          "value": "$exec",
+          "variant": "STATIC_VALUE",
+          "required": false
+        },
+        {
+          "name": "headers",
+          "value": "{\"Content-Type\": \"application/json\"}",
+          "variant": "STATIC_VALUE",
+          "required": false
+        },
+        {
+          "name": "verify",
+          "value": "false",
+          "variant": "STATIC_VALUE",
+          "required": false
+        }
+      ],
+      "position": {"x": 450.0, "y": 400.0},
+      "environment": "onprem",
+      "execution_variable": {"description": "", "id": "", "name": "", "value": ""}
+    },
+    {
+      "app_name": "http",
+      "app_version": "1.4.0",
+      "app_id": "",
+      "errors": null,
+      "id": "create_thehive_alert",
+      "is_valid": true,
+      "isStartNode": false,
+      "label": "Create TheHive Alert",
+      "name": "POST",
+      "parameters": [
+        {
+          "name": "url",
+          "value": "http://172.19.0.1:9003/api/v1/alert",
+          "variant": "STATIC_VALUE",
+          "required": true
+        },
+        {
+          "name": "headers",
+          "value": "{\"Content-Type\": \"application/json\", \"Authorization\": \"Bearer 5WPuhetgYO5E0wp1mc6aAc0S44n4uAuZ\"}",
+          "variant": "STATIC_VALUE",
+          "required": false
+        },
+        {
+          "name": "body",
+          "value": "$exec",
+          "variant": "STATIC_VALUE",
+          "required": false
+        },
+        {
+          "name": "verify",
+          "value": "false",
+          "variant": "STATIC_VALUE",
+          "required": false
+        }
+      ],
+      "position": {"x": 750.0, "y": 400.0},
+      "environment": "onprem",
+      "execution_variable": {"description": "", "id": "", "name": "", "value": ""}
+    }
+  ],
+  "triggers": [
+    {
+      "app_name": "Webhook",
+      "app_version": "1.0.0",
+      "environment": "onprem",
+      "id": "b76d3576-f033-47a3-8731-e8ad8aa62942",
+      "is_valid": true,
+      "label": "Wazuh Webhook",
+      "name": "Webhook",
+      "trigger_type": "WEBHOOK",
+      "parameters": [
+        {"name": "url", "value": "http://20.91.141.211:3002/api/v1/hooks/webhook_b76d3576-f033-47a3-8731-e8ad8aa62942"},
+        {"name": "await_response", "value": "v1"}
+      ],
+      "position": {"x": 150.0, "y": 400.0},
+      "status": "running",
+      "replacement_for_trigger": ""
+    }
+  ],
+  "branches": [
+    {
+      "destination_id": "7ad495bf-0d59-419f-bf60-4343cb084d4b",
+      "id": "41b355cd-aca5-4bb9-b8eb-46a29ff34db8",
+      "source_id": "b76d3576-f033-47a3-8731-e8ad8aa62942",
+      "label": "", "has_errors": false, "conditions": null, "decorator": false
+    },
+    {
+      "destination_id": "create_thehive_alert",
+      "id": "branch_nestjs_to_thehive",
+      "source_id": "7ad495bf-0d59-419f-bf60-4343cb084d4b",
+      "label": "", "has_errors": false, "conditions": null, "decorator": false
+    }
+  ],
+  "execution_org": {"name": "default", "id": "7703d9c5-fed2-44aa-ab8f-ec197d52c79d"},
+  "previously_saved": true
+}
