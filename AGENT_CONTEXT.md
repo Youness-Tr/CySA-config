@@ -451,32 +451,29 @@ shuffle_swarm_executions  → swarm overlay (shuffle workers)
 
 ---
 
-## CURRENT STATUS (VERIFIED 2026-07-11 18:50 UTC)
+## CURRENT STATUS (VERIFIED 2026-07-13 14:00 UTC)
 
 ### ✅ WORKING:
-- Wazuh Manager + Indexer (4.14.5) — API auth ✅, OpenSearch GREEN ✅, 194 alerts
+- Wazuh Manager + Indexer (4.14.5) — API auth ✅, OpenSearch GREEN ✅ (Security plugin initialized and fully authenticated)
 - Wazuh ossec.conf — FIM (syscheck) ✅ enabled, Vuln Detection ✅ enabled, Shuffle integration ✅ configured
 - Wazuh → Shuffle webhook — ✅ LIVE (Wazuh sends level>=3 alerts to Shuffle webhook)
 - Shuffle full stack — backend ✅, frontend ✅, orborus ✅, 6 swarm app services ✅
 - Shuffle webhook (b76d3576) — ✅ running, receives alerts, triggers workflow
 - Shuffle API key — ✅ b2f9fca5-16ca-4e66-a03e-bc80f59f05c4
-- TheHive + Cassandra + MinIO — ✅ login works, API key: 5icIawuRoHIgT52C87umiCZ8gidV8lZf
-- Cysa-proxy Nginx — ✅ :9201 (indexer HTTP) and :55001 (API HTTP)
+- TheHive + Cassandra + MinIO — ✅ login works, SOC org created, integration user API key: 5WPuhetgYO5E0wp1mc6aAc0S44n4uAuZ
+- Cysa-proxy Nginx — ✅ :9201 (indexer HTTP) and :55001 (API HTTP) (auto-injecting correct basic auth header)
 - Docker Swarm — ✅ single-node manager active
+- Shuffle SOAR Pipeline — ✅ FULLY OPERATIONAL. Tests confirm webhook triggers → NestJS POST `/api/v1/soar/sync` (returns 201) → TheHive Alert `/api/v1/alert` (returns 201).
 
 ### ❌ BROKEN / NEEDS FIX:
-- Shuffle workflow POST action — ❌ pointing to STALE Cloudflare tunnel URL, needs NestJS backend URL
-- Shuffle→TheHive case creation — ❌ not wired in the workflow yet
-- Alert routing logic — ❌ no classification (vulnerability / FIM / network_attack) in workflow
 - Wazuh agents — ⏳ DEFERRED (intentional — no agents enrolled yet)
 - NestJS backend .env — needs filling in on developer machine (values known, see above)
 - Tenzir port :1514 — ⏳ DEFERRED (check conflict when agents deployed)
 
-### 🎯 IMMEDIATE NEXT TASK (Phase 1.1 → 1.3):
-Fix the Shuffle workflow:
-1. Update POST action URL to point to NestJS backend /api/v1/soar/sync
-2. Add alert type classification logic
-3. Add TheHive case creation action
+### 🎯 IMMEDIATE NEXT TASK:
+1. Verify the local NestJS backend successfully receives and registers the synchronized SOAR events.
+2. Prepare to enroll the first Wazuh agent on the Azure VM or test endpoint (Phase 2).
+3. Test end-to-end alert pipeline from an actual agent event.
 
 ---
 
