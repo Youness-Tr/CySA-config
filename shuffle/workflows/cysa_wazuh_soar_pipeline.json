@@ -18,7 +18,7 @@
       "parameters": [
         {
           "name": "url",
-          "value": "https://kingston-alpine-cloth-grade.trycloudflare.com/api/v1/soar/sync",
+          "value": "https://dont-cigarettes-weekend-lauderdale.trycloudflare.com/api/v1/soar/sync",
           "variant": "STATIC_VALUE",
           "required": true
         },
@@ -100,6 +100,54 @@
         "name": "",
         "value": ""
       }
+    },
+    {
+      "app_name": "http",
+      "app_version": "1.4.0",
+      "app_id": "",
+      "errors": null,
+      "id": "promote_to_case",
+      "is_valid": true,
+      "isStartNode": false,
+      "label": "Promote Alert to Case",
+      "name": "POST",
+      "parameters": [
+        {
+          "name": "url",
+          "value": "http://172.19.0.1:9003/api/v1/alert/$create_thehive_alert.body._id/case",
+          "variant": "STATIC_VALUE",
+          "required": true
+        },
+        {
+          "name": "headers",
+          "value": "{\"Content-Type\": \"application/json\", \"Authorization\": \"Bearer 5WPuhetgYO5E0wp1mc6aAc0S44n4uAuZ\"}",
+          "variant": "STATIC_VALUE",
+          "required": false
+        },
+        {
+          "name": "body",
+          "value": "{}",
+          "variant": "STATIC_VALUE",
+          "required": false
+        },
+        {
+          "name": "verify",
+          "value": "false",
+          "variant": "STATIC_VALUE",
+          "required": false
+        }
+      ],
+      "position": {
+        "x": 1050.0,
+        "y": 400.0
+      },
+      "environment": "onprem",
+      "execution_variable": {
+        "description": "",
+        "id": "",
+        "name": "",
+        "value": ""
+      }
     }
   ],
   "triggers": [
@@ -144,6 +192,15 @@
       "destination_id": "create_thehive_alert",
       "id": "branch_nestjs_to_thehive",
       "source_id": "7ad495bf-0d59-419f-bf60-4343cb084d4b",
+      "label": "",
+      "has_errors": false,
+      "conditions": null,
+      "decorator": false
+    },
+    {
+      "destination_id": "promote_to_case",
+      "id": "branch_alert_to_case",
+      "source_id": "create_thehive_alert",
       "label": "",
       "has_errors": false,
       "conditions": null,
