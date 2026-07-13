@@ -510,3 +510,47 @@ shuffle_swarm_executions  → swarm overlay (shuffle workers)
 
 10. **Proxy design**: cysa-proxy (Nginx) strips TLS from Wazuh services.
     :9201 = Wazuh Indexer (plain HTTP), :55001 = Wazuh API (plain HTTP).
+
+---
+
+## SOC ARCHITECTURE & 3-TIER ANALYST WORKFLOW
+
+This section details the custom analyst workflow, unified interface architecture, and case context requirements for CySA Atlas.
+
+### 1. The Core Alert & Triage Pipeline
+
+```mermaid
+graph TD
+    A[Deployed Agents] -->|Raw Alerts| B[Wazuh SIEM]
+    B -->|Initial Rule Matching| C[L1 Triage & Verification]
+    C -->|Alert Grouping & Correlation| D[NestJS/Tenzir Correlation Engine]
+    D -->|Correlated Incident| E[Shuffle SOAR Workflow]
+    E -->|Extract Observables| F[Data Extraction Step]
+    F -->|Enrichment via APIs| G[Threat Intel Enrichment]
+    G -->|Confirmation & Validation| H[Case Creation & Auto-Assignment]
+    H -->|Assign by Severity| I[TheHive 5 Case Queue]
+    I -->|Active Response Request| J{Critical Action?}
+    J -->|Yes| K[Request Analyst Permission]
+    J -->|No| L[Automatic Containment]
+    K -->|Approved| M[Execute Active Response via Agent]
+```
+
+* **Alert Correlation**: Before passing alerts to the SOAR pipeline, alerts are correlated (grouped by event types, source IPs, and patterns) in NestJS/Tenzir to ensure analysts deal with unified incidents rather than repetitive alerts.
+* **Extraction & Enrichment**: Shuffle automatically extracts indicators (IPs, domains, hashes) from the correlated event, queries enrichment APIs (AbuseIPDB, VirusTotal, MISP), and logs results.
+* **Case Creation & Assignment**: Cases are automatically created in TheHive under the SOC organisation. The case is assigned to an analyst based on severity:
+  * **Low/Medium**: Assigned to Tier 1 / Tier 2 analysts.
+  * **High/Critical**: Assigned to Tier 3 analysts.
+
+### 2. Interactive Response & Permission Gate
+* When the SOAR pipeline triggers a **critical containment action** (e.g. blocking an IP, terminating a process, or isolating an endpoint), it must not execute silently.
+* Shuffle initiates a **User Approval** step, sending a webhook to the NestJS backend.
+* The NestJS backend displays a prompt to the analyst assigned to the case.
+* Once the analyst clicks **Approve** in the CySA platform UI, NestJS sends a callback to Shuffle to resume the workflow and trigger the Wazuh active response on the target agent.
+
+### 3. Single-Pane-of-Glass & Case Context
+* **No Direct UI Access**: Analysts do not log into the individual backends (Wazuh, Shuffle, TheHive). All operations, logs, playbooks, and cases are accessed exclusively through the custom Next.js + NestJS UI on the developer machine.
+* **Case Context**: When an analyst selects a case, the platform enters the **Case Context**. Under this context:
+  * The **Threat Hunting panel (Tenzir)** automatically restricts searches to logs matching the case observables.
+  * The **Malware Sandbox panel** only shows files submitted for that case.
+  * The **UEBA panel** displays behavior profiles of users/devices involved in the case.
+  * This creates a seamless, focused workspace where the UI adapts entirely to the active investigation.
