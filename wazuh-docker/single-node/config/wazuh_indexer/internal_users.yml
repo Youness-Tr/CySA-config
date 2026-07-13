@@ -1,0 +1,23 @@
+---
+_meta:
+  type: "internalusers"
+  config_version: 2
+
+admin:
+  hash: "$2y$12$K/SpwjtB.wOHJ/Nc6GVpDOzv74Yas6MC65RL8xQQmHCG0aLXr3JKO"
+  reserved: true
+  backend_roles:
+  - "admin"
+  description: "Demo admin user"
+
+kibanaserver:
+  hash: "$2a$12$4AcgAt3xwOWadA5s5blL6ev39OXDNhmOesEoo33eZtrq2N0YrU3H."
+  reserved: true
+  description: "OpenSearch Dashboards user"
+
+readall:
+  hash: "$2a$12$ae4ycwzwvLtZxwZ82RmiEunBbIPiAmGZduBAjKN0TjwreaXtUyfSu"
+  reserved: false
+  backend_roles:
+  - "readall"
+  description: "Demo readall user"
