@@ -22,3 +22,7 @@ __pycache__/
 
 # OS
 .DS_Store
+
+# Local development prompt
+nestjs_prompt.md
+
