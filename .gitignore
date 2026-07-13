@@ -25,4 +25,5 @@ __pycache__/
 
 # Local development prompt
 nestjs_prompt.md
+AGENT_CONTEXT.md
 
