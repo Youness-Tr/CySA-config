@@ -51,7 +51,7 @@ To prevent automated containment actions from accidentally disrupting critical b
     "case_id": "~41005072",
     "action_name": "Isolate Agent / Block IP",
     "target": "185.220.101.50",
-    "callback_url": "http://20.91.141.211:3002/api/v1/hooks/webhook_7f83b19a-d8c3-4e4b-927d-0a887413d9cf?agent=001&case=~41005072"
+    "callback_url": "http://<AZURE_VM_PUBLIC_IP>:3002/api/v1/hooks/webhook_7f83b19a-d8c3-4e4b-927d-0a887413d9cf?agent=001&case=~41005072"
   }
   ```
 * **NestJS Logic**:

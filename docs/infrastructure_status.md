@@ -161,16 +161,19 @@
 
 ## 🔑 CREDENTIALS REFERENCE
 
+> [!NOTE]
+> All sensitive passwords, secrets, and keys have been redacted for safe Git tracking. Refer to the local, gitignored `AGENT_CONTEXT.md` file on the Azure VM for the active credentials.
+
 | Service | URL | Username | Password / Key |
 |---|---|---|---|
-| Wazuh API | https://20.91.141.211:55000 | wazuh-wui | MyS3cr37P450r.*- |
-| Wazuh Indexer | https://20.91.141.211:9200 | admin | SecretPassword |
-| Wazuh Dashboard | https://20.91.141.211:443 | ❌ NOT RUNNING | — |
-| Wazuh Proxy (HTTP) | http://20.91.141.211:9201 | — | (auth injected by proxy) |
-| TheHive | http://20.91.141.211:9003 | admin@thehive.local | secret |
-| TheHive API Key | — | — | `5icIawuRoHIgT52C87umiCZ8gidV8lZf` |
-| Shuffle Backend | http://20.91.141.211:3001 | — | (login via UI) |
-| Shuffle Frontend | http://20.91.141.211:3002 | — | (login via browser) |
-| MinIO | http://20.91.141.211:9001 | admin | adminadmin |
+| Wazuh API | `https://<AZURE_VM_PUBLIC_IP>:55000` | `wazuh-wui` | `<REDACTED_WAZUH_API_PASS>` |
+| Wazuh Indexer | `https://<AZURE_VM_PUBLIC_IP>:9200` | `admin` | `<REDACTED_WAZUH_INDEXER_PASS>` |
+| Wazuh Dashboard | `https://<AZURE_VM_PUBLIC_IP>:443` | ❌ NOT RUNNING | — |
+| Wazuh Proxy (HTTP) | `http://<AZURE_VM_PUBLIC_IP>:9201` | — | *(Auth injected by proxy)* |
+| TheHive | `http://<AZURE_VM_PUBLIC_IP>:9003` | `admin@thehive.local` | `<REDACTED_THEHIVE_PASS>` |
+| TheHive API Key | — | — | `<REDACTED_THEHIVE_API_KEY>` |
+| Shuffle Backend | `http://<AZURE_VM_PUBLIC_IP>:3001` | — | *(Login via UI)* |
+| Shuffle Frontend | `http://<AZURE_VM_PUBLIC_IP>:3002` | — | *(Login via browser)* |
+| MinIO | `http://<AZURE_VM_PUBLIC_IP>:9001` | `admin` | `<REDACTED_MINIO_PASS>` |
 
-*Azure Public IP: **20.91.141.211** | Internal IP: **10.0.0.4***
+*Azure Public IP: **<AZURE_VM_PUBLIC_IP>** | Internal IP: **10.0.0.4***

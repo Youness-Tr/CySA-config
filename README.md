@@ -61,6 +61,6 @@ Use these documents to track where the project stands, understand how the compon
 
 ## 🔑 Port & Service Quick Reference (Azure VM)
 
-* **Shuffle Frontend**: `http://20.91.141.211:3002` (Admin ID: `admin@cysa.local`)
-* **TheHive 5**: `http://20.91.141.211:9003` (Admin ID: `admin@thehive.local`)
-* **Wazuh Proxy (HTTP)**: `http://20.91.141.211:9201` (OpenSearch Indexer endpoint with auto Basic auth)
+* **Shuffle Frontend**: `http://<AZURE_VM_PUBLIC_IP>:3002` (Admin ID: `admin@cysa.local`)
+* **TheHive 5**: `http://<AZURE_VM_PUBLIC_IP>:9003` (Admin ID: `admin@thehive.local`)
+* **Wazuh Proxy (HTTP)**: `http://<AZURE_VM_PUBLIC_IP>:9201` (OpenSearch Indexer endpoint with auto Basic auth)
