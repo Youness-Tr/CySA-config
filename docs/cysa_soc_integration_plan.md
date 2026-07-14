@@ -26,6 +26,13 @@ Instead of triggering a separate Case and SOAR workflow for every single raw ale
      * Consolidate the alerts into a single **Correlated Incident**.
       * Call the Shuffle API (`POST /api/v1/workflows/40642101-1eea-4b86-b1b7-f88404f3b5d5/execute`) to trigger the main SOAR pipeline with the grouped alert details.
 
+### 1.5. SOAR Playbook Enrichment & Ingestion Flow
+
+Once triggered, the main SOAR Playbook (`40642101-1eea-4b86-b1b7-f88404f3b5d5`) automatically executes the following enrichment steps before raising a Case:
+1. **IP Geolocation Lookup**: Hits `https://freeipapi.com/api/json/{source_ip}` to retrieve the country name, country code, region, city, and ISP/ASN organization of the attacker.
+2. **Threat Intelligence Query (Mocked)**: Calls `https://httpbin.org/anything` with a POST payload to mock threat reputation data, simulating VirusTotal hits, abuse confidence scores, and threat classification.
+3. **TheHive Case Creation**: Consolidates the alert metadata, geolocation, and threat intelligence metrics into a rich markdown description and opens a High-Severity Case in TheHive 5.
+
 ---
 
 ## 2. Interactive Response & Approval Gate
