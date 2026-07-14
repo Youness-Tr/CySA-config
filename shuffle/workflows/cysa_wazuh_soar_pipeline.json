@@ -1,7 +1,7 @@
 {
   "id": "40642101-1eea-4b86-b1b7-f88404f3b5d5",
   "name": "CySA Atlas - Wazuh SOAR Pipeline",
-  "description": "Triggered by NestJS Correlation Engine when alert threshold > 5. Handles case creation and approval gate.",
+  "description": "Triggered by NestJS Correlation Engine when alert threshold > 5. Performs enrichment, case promotion, and approval containment.",
   "status": "production",
   "org_id": "7703d9c5-fed2-44aa-ab8f-ec197d52c79d",
   "actions": [
@@ -58,6 +58,96 @@
       "app_version": "1.4.0",
       "app_id": "",
       "errors": null,
+      "id": "enrich_ip",
+      "is_valid": true,
+      "isStartNode": false,
+      "label": "Enrich IP Geolocation",
+      "name": "GET",
+      "parameters": [
+        {
+          "name": "url",
+          "value": "https://freeipapi.com/api/json/$exec.data.srcip",
+          "variant": "STATIC_VALUE",
+          "required": true
+        },
+        {
+          "name": "headers",
+          "value": "{}",
+          "variant": "STATIC_VALUE",
+          "required": false
+        },
+        {
+          "name": "verify",
+          "value": "false",
+          "variant": "STATIC_VALUE",
+          "required": false
+        }
+      ],
+      "position": {
+        "x": 600.0,
+        "y": 200.0
+      },
+      "environment": "onprem",
+      "execution_variable": {
+        "description": "",
+        "id": "",
+        "name": "",
+        "value": ""
+      }
+    },
+    {
+      "app_name": "http",
+      "app_version": "1.4.0",
+      "app_id": "",
+      "errors": null,
+      "id": "mock_threat_intel",
+      "is_valid": true,
+      "isStartNode": false,
+      "label": "Mock Threat Intel",
+      "name": "POST",
+      "parameters": [
+        {
+          "name": "url",
+          "value": "https://httpbin.org/anything",
+          "variant": "STATIC_VALUE",
+          "required": true
+        },
+        {
+          "name": "body",
+          "value": "{\"is_malicious\": true, \"abuse_confidence_score\": 92, \"vt_positives\": 14, \"threat_type\": \"brute_force_scanner\"}",
+          "variant": "STATIC_VALUE",
+          "required": false
+        },
+        {
+          "name": "headers",
+          "value": "{\"Content-Type\": \"application/json\"}",
+          "variant": "STATIC_VALUE",
+          "required": false
+        },
+        {
+          "name": "verify",
+          "value": "false",
+          "variant": "STATIC_VALUE",
+          "required": false
+        }
+      ],
+      "position": {
+        "x": 850.0,
+        "y": 200.0
+      },
+      "environment": "onprem",
+      "execution_variable": {
+        "description": "",
+        "id": "",
+        "name": "",
+        "value": ""
+      }
+    },
+    {
+      "app_name": "http",
+      "app_version": "1.4.0",
+      "app_id": "",
+      "errors": null,
       "id": "create_thehive_alert",
       "is_valid": true,
       "isStartNode": false,
@@ -78,7 +168,7 @@
         },
         {
           "name": "body",
-          "value": "{\"type\": \"wazuh\", \"source\": \"Wazuh SIEM\", \"sourceRef\": \"wazuh-$exec.id\", \"title\": \"[Rule $exec.rule.id] $exec.rule.description\", \"description\": \"Agent: $exec.agent.name ($exec.agent.ip) | Level: $exec.rule.level\", \"severity\": 2, \"tags\": [\"wazuh\", \"siem\", \"automated\"]}",
+          "value": "{\"type\": \"wazuh_correlated\", \"source\": \"Wazuh SIEM\", \"sourceRef\": \"wazuh-$exec.id\", \"title\": \"[Correlated Incident] SSH brute force from $exec.data.srcip\", \"description\": \"Agent: $exec.agent.name ($exec.agent.ip)\\nSource IP: $exec.data.srcip\\n\\n=== GEOLOCATION ENRICHMENT ===\\nCountry: $enrich_ip_geolocation.body.countryName ($enrich_ip_geolocation.body.countryCode)\\nRegion/City: $enrich_ip_geolocation.body.regionName / $enrich_ip_geolocation.body.cityName\\nISP: $enrich_ip_geolocation.body.asnOrganization\\n\\n=== THREAT INTELLIGENCE (MOCK) ===\\nMalicious: $mock_threat_intel.body.json.is_malicious\\nAbuse Confidence Score: $mock_threat_intel.body.json.abuse_confidence_score%\\nVirusTotal Positives: $mock_threat_intel.body.json.vt_positives/90\\nThreat Classification: $mock_threat_intel.body.json.threat_type\", \"severity\": 3, \"tags\": [\"wazuh\", \"correlated\", \"enriched\"]}",
           "variant": "STATIC_VALUE",
           "required": false
         },
@@ -90,7 +180,7 @@
         }
       ],
       "position": {
-        "x": 600.0,
+        "x": 1100.0,
         "y": 200.0
       },
       "environment": "onprem",
@@ -138,7 +228,7 @@
         }
       ],
       "position": {
-        "x": 850.0,
+        "x": 1350.0,
         "y": 200.0
       },
       "environment": "onprem",
@@ -168,7 +258,7 @@
         },
         {
           "name": "body",
-          "value": "{\"approval_id\": \"$exec.id\", \"case_id\": \"$promote_alert_to_case.body._id\", \"action_name\": \"Isolate Agent / Block IP\", \"target\": \"$exec.agent.name\", \"callback_url\": \"http://20.91.141.211:3002/api/v1/hooks/7f83b19a-d8c3-4e4b-927d-0a887413d9cf?agent=$exec.agent.id&case=$promote_alert_to_case.body._id\"}",
+          "value": "{\"approval_id\": \"$exec.id\", \"case_id\": \"$promote_alert_to_case.body._id\", \"action_name\": \"Isolate Agent / Block IP\", \"target\": \"$exec.agent.name\", \"callback_url\": \"http://20.91.141.211:3002/api/v1/hooks/webhook_7f83b19a-d8c3-4e4b-927d-0a887413d9cf?agent=$exec.agent.id&case=$promote_alert_to_case.body._id\"}",
           "variant": "STATIC_VALUE",
           "required": false
         },
@@ -186,7 +276,7 @@
         }
       ],
       "position": {
-        "x": 1100.0,
+        "x": 1600.0,
         "y": 200.0
       },
       "environment": "onprem",
@@ -216,7 +306,7 @@
         },
         {
           "name": "body",
-          "value": "{\"event_type\": \"network_attack\", \"identifier\": \"$exec.args.agent\", \"score\": 7, \"target_host\": \"azure-vm\", \"remediation_status\": \"contained\"}",
+          "value": "{\"event_type\": \"network_attack\", \"identifier\": \"$exec.args.agent\", \"score\": 9, \"target_host\": \"azure-vm\", \"remediation_status\": \"contained\"}",
           "variant": "STATIC_VALUE",
           "required": false
         },
@@ -259,7 +349,7 @@
       "parameters": [
         {
           "name": "url",
-          "value": "http://20.91.141.211:3002/api/v1/hooks/nestjs_correlation_webhook"
+          "value": "http://20.91.141.211:3002/api/v1/hooks/webhook_nestjs_correlation_webhook"
         },
         {
           "name": "await_response",
@@ -311,9 +401,27 @@
       "decorator": false
     },
     {
-      "destination_id": "create_thehive_alert",
-      "id": "branch_sync_to_alert",
+      "destination_id": "enrich_ip",
+      "id": "branch_sync_to_enrich",
       "source_id": "soar_sync_nestjs",
+      "label": "",
+      "has_errors": false,
+      "conditions": null,
+      "decorator": false
+    },
+    {
+      "destination_id": "mock_threat_intel",
+      "id": "branch_enrich_to_ti",
+      "source_id": "enrich_ip",
+      "label": "",
+      "has_errors": false,
+      "conditions": null,
+      "decorator": false
+    },
+    {
+      "destination_id": "create_thehive_alert",
+      "id": "branch_ti_to_alert",
+      "source_id": "mock_threat_intel",
       "label": "",
       "has_errors": false,
       "conditions": null,
