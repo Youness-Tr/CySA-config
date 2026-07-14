@@ -32,6 +32,8 @@ CySA Atlas integrates industry-standard security tools with a custom Next.js/Nes
 
 Use these documents to track where the project stands, understand how the components interact, and find setup instructions:
 
+* 📈 **[Active Progress & Pipeline Tracking](./PROGRESS_TRACKING.md)**:
+  * Real-time update log of verified milestones, active data flows, and current infrastructure checklist.
 * 🧭 **[Infrastructure Status & Roadmap](./docs/infrastructure_status.md)**:
   * Current container/service health.
   * Verified workflows and data metrics.
