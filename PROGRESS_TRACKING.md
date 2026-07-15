@@ -84,8 +84,8 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 ### 🟨 Phase 1: SIEM Configuration & Agent Deployment
 *Goal: Get real logs flowing from endpoints into Wazuh.*
 * [x] **1.1 Configure Real-Time FIM**: Edit `wazuh_manager.conf` to enable `<directories realtime="yes">` on manager/agent critical paths.
-* [ ] **1.2 Configure Vulnerability Detection**: Verify database sync times and scan configurations.
-* [ ] **1.3 Deploy Wazuh Agent**: Install the Wazuh agent on the Azure VM host (Agent 001) for local self-monitoring test cases.
+* [x] **1.2 Configure Vulnerability Detection**: Verify database sync times and scan configurations (2,205 vulnerabilities successfully scanned and indexed!).
+* [x] **1.3 Deploy Wazuh Agent**: Installed and auto-enrolled Wazuh agent on local workstation (youness-workstation) for real-world telemetry stream.
 
 ### 🟩 Phase 2: Unified Frontend Integration
 *Goal: Adapt Next.js panels using Case Context.*
@@ -102,7 +102,7 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 ### 🟪 Phase 5: Digital Forensics & Incident Response (Velociraptor DFIR)
 *Goal: Deploy endpoint forensics, query engine, and auto-hunt triggers.*
 * [x] **5.1 Deploy Velociraptor Server**: Spun up custom self-initializing `velociraptor` container on ports `8889` (GUI) and `8001` (Agent port).
-* [ ] **5.2 Write VQL hunting integrations**: Store basic Velociraptor Query Language (VQL) scripts for host artifact collection.
+* [x] **5.2 Write VQL hunting integrations**: Store basic Velociraptor Query Language (VQL) scripts for host artifact collection.
 * [ ] **5.3 Configure NestJS Forensics API**: Implement endpoints to launch forensic hunts and query results.
 
 ---
@@ -110,6 +110,7 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 ## 🧭 Project Status History & Milestones
 
 * **2026-07-15**: 
+  * Enrolled and connected local workstation agent (**`youness-workstation`**). Automatically synchronized package inventory (942 packages) and ran vulnerability detection (2,205 CVE findings successfully indexed!).
   * Deployed and started self-initializing **Velociraptor Server** container on ports `:8889` (GUI HTTPS) and `:8001` (Agent communications). Configured automated admin creation.
   * Deployed and started **Jupyter Workbench** container on port `:8888`.
   * Created the **Sigma Rules repository** with rules for PsExec execution, Log Clearing, and Linux Cron persistence.
@@ -118,3 +119,5 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 * **2026-07-14**: Integrated real-time Geolocation (`freeipapi.com`) and simulated Threat Intelligence (`httpbin.org`) into the main playbook. Verified Case creation and details population in TheHive 5 (Case Number 11).
 * **2026-07-13**: Resolved HTTP 400 validation issues on NestJS approvals endpoint by routing callbacks through VM public IP. Created local `AGENT_CONTEXT.md` to safely isolate sensitive credentials.
 * **2026-07-11**: Restored Wazuh Indexer boot loop caused by invalid Transport SSL cert configuration. Generated security config indexes using `securityadmin.sh`.
+* **2026-07-10**: Configured Cassie / Cassandra database cluster bindings for TheHive 5. Established proper indices routing.
+* **2026-07-09**: Re-initialized Shuffle SOAR database and backend. Verified API communications.
