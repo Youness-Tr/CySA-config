@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  velociraptor:
+    image: ubuntu:22.04
+    container_name: velociraptor
+    working_dir: /velociraptor
+    ports:
+      - "8889:8889"
+      - "8001:8000"
+    volumes:
+      - /opt/cysa/velociraptor/config:/velociraptor/config
+      - /opt/cysa/velociraptor/data:/velociraptor/data
+      - /opt/cysa/velociraptor/entrypoint.sh:/entrypoint.sh
+    entrypoint:
+      - /bin/bash
+      - /entrypoint.sh
+    restart: unless-stopped
+    networks:
+      - default
+
+networks:
+  default:
+    name: single-node_default
+    external: true
