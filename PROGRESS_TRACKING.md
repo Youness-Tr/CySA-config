@@ -81,7 +81,7 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 
 ### 🟨 Phase 1: SIEM Configuration & Agent Deployment
 *Goal: Get real logs flowing from endpoints into Wazuh.*
-* [ ] **1.1 Configure Real-Time FIM**: Edit `wazuh_manager.conf` to enable `<directories realtime="yes">` on manager/agent critical paths.
+* [x] **1.1 Configure Real-Time FIM**: Edit `wazuh_manager.conf` to enable `<directories realtime="yes">` on manager/agent critical paths.
 * [ ] **1.2 Configure Vulnerability Detection**: Verify database sync times and scan configurations.
 * [ ] **1.3 Deploy Wazuh Agent**: Install the Wazuh agent on the Azure VM host (Agent 001) for local self-monitoring test cases.
 
@@ -95,7 +95,7 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 
 ## 🧭 Project Status History & Milestones
 
-* **2026-07-15**: Recreated and committed `docker-compose.yml` configurations for Wazuh, TheHive, Shuffle, and Nginx proxy to both the git repository and active runtime paths.
+* **2026-07-15**: Configured and activated real-time File Integrity Monitoring (FIM) inside Wazuh Manager. Verified instantaneous alert generation (Rule 554) and indexing in OpenSearch upon file additions. Also recreated and committed all `docker-compose.yml` configurations for Wazuh, TheHive, Shuffle, and Nginx proxy to both the git repository and active runtime paths.
 * **2026-07-14**: Integrated real-time Geolocation (`freeipapi.com`) and simulated Threat Intelligence (`httpbin.org`) into the main playbook. Verified Case creation and details population in TheHive 5 (Case Number 11).
 * **2026-07-13**: Resolved HTTP 400 validation issues on NestJS approvals endpoint by routing callbacks through VM public IP. Created local `AGENT_CONTEXT.md` to safely isolate sensitive credentials.
 * **2026-07-11**: Restored Wazuh Indexer boot loop caused by invalid Transport SSL cert configuration. Generated security config indexes using `securityadmin.sh`.
