@@ -91,11 +91,21 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 * [ ] **2.2 Threat Hunting Logs Integration**: Ensure `/api/v1/network/search` fetches active case observables from TheHive and appends them to Tenzir queries automatically.
 * [ ] **2.3 Sandbox upload integration**: Limit `/api/v1/sandbox/status` query details to files matching active Case ID.
 
+### 🟦 Phase 4: Advanced Modules (Threat Hunting & Jupyter)
+*Goal: Deploy advanced detection, notebooks, and hunt escalation.*
+* [x] **4.1 Deploy Jupyter Workbench**: Spun up `jupyter-workbench` container on port `:8888` (token: `cysa-atlas-hunt`).
+* [x] **4.2 Import Sigma Rules**: Created rules repository `/opt/CySA-config/sigma/rules/` with lateral movement, defense evasion, and persistence detections.
+* [ ] **4.3 Configure NestJS Hunting API**: Implement `/api/v1/hunting/*` rules list, OpenSearch converter, and escalation logic.
+
 ---
 
 ## 🧭 Project Status History & Milestones
 
-* **2026-07-15**: Configured and activated real-time File Integrity Monitoring (FIM) inside Wazuh Manager. Verified instantaneous alert generation (Rule 554) and indexing in OpenSearch upon file additions. Also recreated and committed all `docker-compose.yml` configurations for Wazuh, TheHive, Shuffle, and Nginx proxy to both the git repository and active runtime paths.
+* **2026-07-15**: 
+  * Deployed and started **Jupyter Workbench** container on port `:8888`.
+  * Created the **Sigma Rules repository** with rules for PsExec execution, Log Clearing, and Linux Cron persistence.
+  * Configured and activated real-time File Integrity Monitoring (FIM) inside Wazuh Manager. Verified instantaneous alert generation (Rule 554) and indexing in OpenSearch upon file additions.
+  * Recreated and committed all `docker-compose.yml` configurations for Wazuh, TheHive, Shuffle, and Nginx proxy to both the git repository and active runtime paths.
 * **2026-07-14**: Integrated real-time Geolocation (`freeipapi.com`) and simulated Threat Intelligence (`httpbin.org`) into the main playbook. Verified Case creation and details population in TheHive 5 (Case Number 11).
 * **2026-07-13**: Resolved HTTP 400 validation issues on NestJS approvals endpoint by routing callbacks through VM public IP. Created local `AGENT_CONTEXT.md` to safely isolate sensitive credentials.
 * **2026-07-11**: Restored Wazuh Indexer boot loop caused by invalid Transport SSL cert configuration. Generated security config indexes using `securityadmin.sh`.

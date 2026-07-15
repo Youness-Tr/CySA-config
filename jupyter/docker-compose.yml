@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  jupyter:
+    image: jupyter/base-notebook:latest
+    container_name: jupyter-workbench
+    command: start-notebook.sh --NotebookApp.token='cysa-atlas-hunt'
+    ports:
+      - "8888:8888"
+    volumes:
+      - /opt/cysa/jupyter/notebooks:/home/jovyan/work
+    restart: unless-stopped
+    networks:
+      - cysa_network
+
+networks:
+  cysa_network:
+    name: single-node_default
+    external: true
