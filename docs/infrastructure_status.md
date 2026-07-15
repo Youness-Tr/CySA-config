@@ -177,3 +177,32 @@
 | MinIO | `http://<AZURE_VM_PUBLIC_IP>:9001` | `admin` | `<REDACTED_MINIO_PASS>` |
 
 *Azure Public IP: **<AZURE_VM_PUBLIC_IP>** | Internal IP: **10.0.0.4***
+
+---
+
+## 💿 MOUNTED VOLUMES REFERENCE
+
+Below is the mapping of host paths and named volumes to their corresponding container directories:
+
+| Service Stack | Local (Host) Mount Path / Volume Name | Container Mount Path | Mount Type & Purpose |
+| :--- | :--- | :--- | :--- |
+| **Wazuh Manager** | `/opt/cysa/wazuh-docker/single-node/config/wazuh_cluster/wazuh_manager.conf` | `/wazuh-config-mount/etc/ossec.conf` | Read-write file (ossec configuration) |
+| | `/opt/cysa/wazuh-docker/single-node/config/wazuh_indexer_ssl_certs/root-ca-manager.pem` | `/etc/ssl/root-ca.pem` | SSL root certificate authority |
+| | `/opt/cysa/wazuh-docker/single-node/config/wazuh_indexer_ssl_certs/wazuh.manager.pem` | `/etc/ssl/filebeat.pem` | Manager TLS certificate |
+| | `/opt/cysa/wazuh-docker/single-node/config/wazuh_indexer_ssl_certs/wazuh.manager-key.pem` | `/etc/ssl/filebeat.key` | Manager TLS private key |
+| | Named Volume: `single-node_wazuh_etc` | `/var/ossec/etc` | Persists manager credentials, keys, rules |
+| | Named Volume: `single-node_wazuh_logs` | `/var/ossec/logs` | Persists alerts (`alerts.json`) and system logs |
+| | *Other named volumes:* queue, integrations, active_response, api_configuration, agentless, wodles, filebeat_etc, filebeat_var | Corresponding internal paths | Standard system state persistence |
+| **Wazuh Indexer** | `/opt/cysa/wazuh-docker/single-node/config/wazuh_indexer/wazuh.indexer.yml` | `/usr/share/wazuh-indexer/config/opensearch.yml` | Indexer database configuration |
+| | `/opt/cysa/wazuh-docker/single-node/config/wazuh_indexer/internal_users.yml` | `/usr/share/wazuh-indexer/config/opensearch-security/internal_users.yml` | Custom database user configurations |
+| | SSL cert mounts (`root-ca.pem`, `wazuh.indexer.key`, `wazuh.indexer.pem`, `admin.pem`, `admin-key.pem`) | `/usr/share/wazuh-indexer/config/certs/` | Transport layer security certificates |
+| | Named Volume: `single-node_wazuh-indexer-data` | `/var/lib/wazuh-indexer` | Persists Elasticsearch/OpenSearch indices |
+| **TheHive 5** | `/opt/cysa/thehive/application.conf` | `/etc/thehive/application.conf` | Play framework configuration |
+| | `/opt/cysa/thehive/cassandra` | `/var/lib/cassandra` | Persists Cassandra databases |
+| | `/opt/cysa/thehive/minio` | `/data` | Persists case files & attachments |
+| **Shuffle SOAR** | `/var/run/docker.sock` | `/var/run/docker.sock` | Socket mount (allows Orborus to start Swarm app workers) |
+| | Named Volume: `shuffle_shuffle_db` | `/usr/share/opensearch/data` | Persists Shuffle app database |
+| | Named Volume: `shuffle_shuffle_apps` | `/shuffle-apps` | Persists hot-loaded playbook apps |
+| | Named Volume: `shuffle_shuffle_data` | `/etc/shuffle` | Persists user profiles and credentials |
+| **Nginx Proxy** | `/opt/cysa/proxy/nginx.conf` | `/etc/nginx/conf.d/default.conf` | Nginx HTTP proxy routing rules |
+
