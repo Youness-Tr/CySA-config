@@ -69,6 +69,8 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 | `thehive-cassandra` | Cassandra DB | *Internal* | ✅ Up (Healthy) | Backend DB for case indexes |
 | `thehive-minio` | MinIO Storage | `:9000`, `:9001` | ✅ Up (Healthy) | Stores case attachments & files |
 | `tenzir-node` | Tenzir Node | `:5160` | ✅ Up | High-performance log parsing engine |
+| `jupyter-workbench` | Jupyter Workbench | `:8888` | ✅ Up (Healthy) | Python notebooks console (token: `cysa-atlas-hunt`) |
+| `velociraptor` | Velociraptor Server | `:8889`, `:8001` | ✅ Up | DFIR client manager & VQL query server |
 
 ---
 
@@ -97,11 +99,18 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 * [x] **4.2 Import Sigma Rules**: Created rules repository `/opt/CySA-config/sigma/rules/` with lateral movement, defense evasion, and persistence detections.
 * [ ] **4.3 Configure NestJS Hunting API**: Implement `/api/v1/hunting/*` rules list, OpenSearch converter, and escalation logic.
 
+### 🟪 Phase 5: Digital Forensics & Incident Response (Velociraptor DFIR)
+*Goal: Deploy endpoint forensics, query engine, and auto-hunt triggers.*
+* [x] **5.1 Deploy Velociraptor Server**: Spun up custom self-initializing `velociraptor` container on ports `8889` (GUI) and `8001` (Agent port).
+* [ ] **5.2 Write VQL hunting integrations**: Store basic Velociraptor Query Language (VQL) scripts for host artifact collection.
+* [ ] **5.3 Configure NestJS Forensics API**: Implement endpoints to launch forensic hunts and query results.
+
 ---
 
 ## 🧭 Project Status History & Milestones
 
 * **2026-07-15**: 
+  * Deployed and started self-initializing **Velociraptor Server** container on ports `:8889` (GUI HTTPS) and `:8001` (Agent communications). Configured automated admin creation.
   * Deployed and started **Jupyter Workbench** container on port `:8888`.
   * Created the **Sigma Rules repository** with rules for PsExec execution, Log Clearing, and Linux Cron persistence.
   * Configured and activated real-time File Integrity Monitoring (FIM) inside Wazuh Manager. Verified instantaneous alert generation (Rule 554) and indexing in OpenSearch upon file additions.
