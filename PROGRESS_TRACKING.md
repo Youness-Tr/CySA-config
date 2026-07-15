@@ -76,7 +76,7 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 
 ### 🟥 Phase 0: Configuration as Code (Current Focus)
 *Goal: Recreate compose configurations and maintain repository integrity.*
-* [ ] **0.1 Recreate Compose Files**: Generate `docker-compose.yml` for Wazuh, Shuffle, and TheHive, saving them to `CySA-config` to replace the lost ones.
+* [x] **0.1 Recreate Compose Files**: Generate `docker-compose.yml` for Wazuh, Shuffle, and TheHive, saving them to `CySA-config` to replace the lost ones.
 * [x] **0.2 Consolidate Directories**: Clean up duplicates and keep `CySA-config` as the single source of truth.
 
 ### 🟨 Phase 1: SIEM Configuration & Agent Deployment
@@ -95,6 +95,7 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 
 ## 🧭 Project Status History & Milestones
 
+* **2026-07-15**: Recreated and committed `docker-compose.yml` configurations for Wazuh, TheHive, Shuffle, and Nginx proxy to both the git repository and active runtime paths.
 * **2026-07-14**: Integrated real-time Geolocation (`freeipapi.com`) and simulated Threat Intelligence (`httpbin.org`) into the main playbook. Verified Case creation and details population in TheHive 5 (Case Number 11).
 * **2026-07-13**: Resolved HTTP 400 validation issues on NestJS approvals endpoint by routing callbacks through VM public IP. Created local `AGENT_CONTEXT.md` to safely isolate sensitive credentials.
 * **2026-07-11**: Restored Wazuh Indexer boot loop caused by invalid Transport SSL cert configuration. Generated security config indexes using `securityadmin.sh`.

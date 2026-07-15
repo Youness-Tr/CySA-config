@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  cysa-proxy:
+    image: nginx:alpine
+    container_name: cysa-proxy
+    volumes:
+      - /opt/cysa/proxy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "55001:55001"
+      - "9201:9201"
+    restart: unless-stopped
+    networks:
+      - default
+
+networks:
+  default:
+    name: single-node_default
+    external: true

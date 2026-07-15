@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  cassandra:
+    image: cassandra:4.1
+    container_name: thehive-cassandra
+    environment:
+      - MAX_HEAP_SIZE=1G
+      - HEAP_NEWSIZE=256M
+    volumes:
+      - /opt/cysa/thehive/cassandra:/var/lib/cassandra:rw
+    restart: unless-stopped
+    networks:
+      - shuffle_network
+
+  minio:
+    image: minio/minio
+    container_name: thehive-minio
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=adminadmin
+    volumes:
+      - /opt/cysa/thehive/minio:/data:rw
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    restart: unless-stopped
+    networks:
+      - shuffle_network
+
+  thehive:
+    image: strangebee/thehive:5
+    container_name: thehive
+    depends_on:
+      - cassandra
+      - minio
+    volumes:
+      - /opt/cysa/thehive/application.conf:/etc/thehive/application.conf:rw
+    ports:
+      - "9003:9000"
+    restart: unless-stopped
+    networks:
+      - shuffle_network
+
+networks:
+  shuffle_network:
+    name: shuffle_shuffle_network
+    external: true

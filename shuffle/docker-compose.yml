@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  shuffle-database:
+    image: opensearchproject/opensearch:2.11.0
+    container_name: shuffle-database
+    environment:
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+      - DISABLE_SECURITY_PLUGIN=true
+      - cluster.name=shuffle-cluster
+      - node.name=shuffle-database
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - shuffle_db:/usr/share/opensearch/data:rw
+    restart: unless-stopped
+    networks:
+      - shuffle_network
+
+  shuffle-backend:
+    image: frikky/shuffle-backend:latest
+    container_name: shuffle-backend
+    environment:
+      - SHUFFLE_OPENSEARCH_URL=http://shuffle-database:9200
+      - DATASTORE_EMULATOR_HOST=shuffle-database:9200
+      - SHUFFLE_APP_HOTLOAD_FOLDER=/shuffle-apps
+      - SHUFFLE_FILE_LOCATION=/shuffle-files
+      - ORG_ID=Shuffle
+      - ENVIRONMENT_NAME=Shuffle
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - shuffle_apps:/shuffle-apps:rw
+      - shuffle_data:/etc/shuffle:rw
+      - shuffle_files:/shuffle-files:rw
+    ports:
+      - "3001:5001"
+    restart: unless-stopped
+    depends_on:
+      - shuffle-database
+    networks:
+      - shuffle_network
+      - swarm_network
+
+  shuffle-frontend:
+    image: frikky/shuffle-frontend:latest
+    container_name: shuffle-frontend
+    environment:
+      - BACKEND_HOSTNAME=shuffle-backend
+    ports:
+      - "3002:80"
+    restart: unless-stopped
+    depends_on:
+      - shuffle-backend
+    networks:
+      - shuffle_network
+
+  shuffle-orborus:
+    image: ghcr.io/shuffle/shuffle-orborus:latest
+    container_name: shuffle-orborus
+    environment:
+      - SHUFFLE_WORKER_IMAGE=ghcr.io/shuffle/shuffle-worker:latest
+      - SHUFFLE_APP_SDK_TIMEOUT=300
+      - ENVIRONMENT_NAME=Shuffle
+      - BASE_URL=http://shuffle-backend:5001
+      - DOCKER_API_VERSION=1.44
+      - SHUFFLE_STATS_DISABLED=true
+      - SHUFFLE_LOGS_DISABLED=true
+      - SHUFFLE_SWARM_CONFIG=run
+      - CLEANUP=false
+      - ORG_ID=Shuffle
+      - SHUFFLE_OPENSEARCH_URL=https://opensearch:9200
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    restart: unless-stopped
+    depends_on:
+      - shuffle-backend
+    networks:
+      - shuffle_network
+      - swarm_network
+
+volumes:
+  shuffle_db:
+    name: shuffle_shuffle_db
+  shuffle_apps:
+    name: shuffle_shuffle_apps
+  shuffle_data:
+    name: shuffle_shuffle_data
+  shuffle_files:
+    name: shuffle_shuffle_files
+
+networks:
+  shuffle_network:
+    name: shuffle_shuffle_network
+  swarm_network:
+    name: shuffle_swarm_executions
+    external: true
