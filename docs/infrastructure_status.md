@@ -180,6 +180,32 @@
 
 ---
 
+## 🗄️ DATA STORAGE ARCHITECTURE
+
+To ensure high performance and scalability, the data is divided across three dedicated storage layers based on the type of data and who/what accesses it:
+
+### 1. Case Management Layer (TheHive 5)
+* **Cassandra (NoSQL Database)**: Stores all Case Management metadata, structural entities, and audit logs:
+  * **Alerts**: Ingested log alerts waiting for Tier 1 triage.
+  * **Cases**: Incident details, severity, logs of actions, timeline events, and task checklists.
+  * **Observables**: Extracted Indicators of Compromise (IOCs) such as attacker IPs, domains, and file hashes.
+  * **Tasks & Audit Logs**: Detailed tracking of analyst actions and workflow audits.
+* **MinIO (S3 Object Storage)**: Stores raw attachments and binary artifacts:
+  * Uploaded malware samples, PCAP captures, system logs, and analyst screenshots.
+
+### 2. SIEM & Log Telemetry Layer (Wazuh Indexer)
+* **OpenSearch**: Stores all high-volume telemetry and alerts from the manager and enrolled agents:
+  * **`wazuh-alerts-4.x-*` (Security Alerts)**: Log entries that matched a security rule level $\ge 3$.
+  * **`wazuh-states-inventory-*-wazuh.manager/agent` (System Inventory)**: State databases collected by `syscollector` (hardware, OS, interfaces, listening ports, running processes, packages).
+  * **`wazuh-states-vulnerabilities-*` (Vulnerabilities Database)**: Active CVE scan results matching package inventories.
+  * **`wazuh-archives-4.x-*` (Raw Archives)**: (Optional) Raw un-filtered log streams for deep compliance logging.
+
+### 3. SOAR Workflow Layer (Shuffle Database)
+* **OpenSearch**: Stores internal automation engine states:
+  * Playbook configurations, execution metadata, runtime variables, and webhook trigger registrations.
+
+---
+
 ## 💿 MOUNTED VOLUMES REFERENCE
 
 Below is the mapping of host paths and named volumes to their corresponding container directories:
