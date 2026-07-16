@@ -18,7 +18,7 @@
       "parameters": [
         {
           "name": "url",
-          "value": "https://acid-aging-answering-completed.trycloudflare.com/api/v1/soar/alert",
+          "value": "http://20.91.141.211:4000/api/v1/soar/alert",
           "variant": "STATIC_VALUE",
           "required": true
         },

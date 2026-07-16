@@ -18,7 +18,7 @@
       "parameters": [
         {
           "name": "url",
-          "value": "https://acid-aging-answering-completed.trycloudflare.com/api/v1/soar/sync",
+          "value": "http://20.91.141.211:4000/api/v1/soar/sync",
           "variant": "STATIC_VALUE",
           "required": true
         },
@@ -252,7 +252,7 @@
       "parameters": [
         {
           "name": "url",
-          "value": "https://acid-aging-answering-completed.trycloudflare.com/api/v1/soar/approvals",
+          "value": "http://20.91.141.211:4000/api/v1/soar/approvals",
           "variant": "STATIC_VALUE",
           "required": true
         },
@@ -300,7 +300,7 @@
       "parameters": [
         {
           "name": "url",
-          "value": "https://acid-aging-answering-completed.trycloudflare.com/api/v1/soar/sync",
+          "value": "http://20.91.141.211:4000/api/v1/soar/sync",
           "variant": "STATIC_VALUE",
           "required": true
         },
