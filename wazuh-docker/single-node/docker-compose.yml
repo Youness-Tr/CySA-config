@@ -53,6 +53,7 @@ services:
       - wazuh_wodles:/var/ossec/wodles:rw
       - filebeat_etc:/etc/filebeat:rw
       - filebeat_var:/var/lib/filebeat:rw
+      - /var/log/suricata:/var/log/suricata:ro
       - /opt/cysa/wazuh-docker/single-node/config/wazuh_cluster/wazuh_manager.conf:/wazuh-config-mount/etc/ossec.conf:rw
       - /opt/cysa/wazuh-docker/single-node/config/wazuh_indexer_ssl_certs/root-ca-manager.pem:/etc/ssl/root-ca.pem:rw
       - /opt/cysa/wazuh-docker/single-node/config/wazuh_indexer_ssl_certs/wazuh.manager.pem:/etc/ssl/filebeat.pem:rw

@@ -116,6 +116,11 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
   * Replaced mock fleet data with live Wazuh API telemetry on the "Agents" dashboard, including real-time OS/Subnet distributions and dynamic risk scoring.
   * Added a search interface and a functional multi-OS deployment command generator inside the Agents page.
   * Replaced mock EDR threat charts on the "Endpoints Security" dashboard with live parsed categories (SCA rules, authentication, systemd failures) and configured active containment isolation actions.
+  * Initialized `wazuh-indexer` security plugin configuration using `securityadmin.sh` with correct admin certificates to restore OpenSearch availability.
+  * Configured active Suricata IDS network capturing on VM gateway interface (`eth0`) and mapped `eve.json` log ingestion directly into the Wazuh Manager stack.
+  * Connected "Network Security (NDR)" dashboard to live stats, top talkers, and threat flow queries. Implemented persistent local IP block/unblock policies.
+  * Integrated "Security Events (SIEM Alerts)" workspace with a NestJS-backed dynamic correlation engine that aggregates raw alerts in 5-minute windows.
+  * Connected "Integrity Monitor (FIM)" dashboard to live syscheck queries and implemented persistent analyst approvals and SOAR escalation events.
 * **2026-07-15**: 
   * Enrolled and connected local workstation agent (**`youness-workstation`**). Automatically synchronized package inventory (942 packages) and ran vulnerability detection (2,205 CVE findings successfully indexed!).
   * Deployed and started self-initializing **Velociraptor Server** container on ports `:8889` (GUI HTTPS) and `:8001` (Agent communications). Configured automated admin creation.
