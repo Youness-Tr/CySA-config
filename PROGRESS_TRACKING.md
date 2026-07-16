@@ -109,6 +109,12 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 
 ## 🧭 Project Status History & Milestones
 
+* **2026-07-16**:
+  * Cloned the `CySA-Atlas` frontend/backend monorepo onto the Azure VM (`/opt/CySA-Atlas`).
+  * Built and deployed the platform containers (Next.js frontend, NestJS backend, and PostgreSQL database) directly on the VM.
+  * Rebuilt database workflow triggers in Shuffle's OpenSearch instance to route directly to VM port `4000`, completely eliminating Cloudflare tunnels.
+  * Replaced mock fleet data with live Wazuh API telemetry on the "Agents" dashboard, including real-time OS/Subnet distributions and dynamic risk scoring.
+  * Added a search interface and a functional multi-OS deployment command generator inside the Agents page.
 * **2026-07-15**: 
   * Enrolled and connected local workstation agent (**`youness-workstation`**). Automatically synchronized package inventory (942 packages) and ran vulnerability detection (2,205 CVE findings successfully indexed!).
   * Deployed and started self-initializing **Velociraptor Server** container on ports `:8889` (GUI HTTPS) and `:8001` (Agent communications). Configured automated admin creation.
