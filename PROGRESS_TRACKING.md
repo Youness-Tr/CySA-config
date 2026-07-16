@@ -115,6 +115,7 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
   * Rebuilt database workflow triggers in Shuffle's OpenSearch instance to route directly to VM port `4000`, completely eliminating Cloudflare tunnels.
   * Replaced mock fleet data with live Wazuh API telemetry on the "Agents" dashboard, including real-time OS/Subnet distributions and dynamic risk scoring.
   * Added a search interface and a functional multi-OS deployment command generator inside the Agents page.
+  * Replaced mock EDR threat charts on the "Endpoints Security" dashboard with live parsed categories (SCA rules, authentication, systemd failures) and configured active containment isolation actions.
 * **2026-07-15**: 
   * Enrolled and connected local workstation agent (**`youness-workstation`**). Automatically synchronized package inventory (942 packages) and ran vulnerability detection (2,205 CVE findings successfully indexed!).
   * Deployed and started self-initializing **Velociraptor Server** container on ports `:8889` (GUI HTTPS) and `:8001` (Agent communications). Configured automated admin creation.
