@@ -87,11 +87,13 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 * [x] **1.2 Configure Vulnerability Detection**: Verify database sync times and scan configurations (2,205 vulnerabilities successfully scanned and indexed!).
 * [x] **1.3 Deploy Wazuh Agent**: Installed and auto-enrolled Wazuh agent on local workstation (youness-workstation) for real-world telemetry stream.
 
-### 🟩 Phase 2: Unified Frontend Integration
-*Goal: Adapt Next.js panels using Case Context.*
-* [ ] **2.1 Resolve NestJS executions trigger URL**: Apply the `/execute` fix in the NestJS controller.
-* [ ] **2.2 Threat Hunting Logs Integration**: Ensure `/api/v1/network/search` fetches active case observables from TheHive and appends them to Tenzir queries automatically.
-* [ ] **2.3 Sandbox upload integration**: Limit `/api/v1/sandbox/status` query details to files matching active Case ID.
+### 🟩 Phase 2: Unified Frontend Integration & Triage Desk
+*Goal: Adapt Next.js panels using Case Context and real SOAR/Case data.*
+* [x] **2.1 Resolve NestJS executions trigger URL**: Implemented the `/execute` call in the NestJS controller and client-side helpers.
+* [x] **2.2 Case Management TheHive Integration**: Connected NestJS backend proxy endpoints (`GET /api/v1/case/list`, `POST /api/v1/case/create`) and Next.js frontend to list/create real cases from TheHive 5.
+* [x] **2.3 SOAR Workflow Visualizer**: Integrated dynamic ReactFlow visualizer reading real-time Shuffle playbooks.
+* [x] **2.4 Human-in-the-Loop Approvals Pipeline**: Constrained SOAR approvals console to display pending items *only* after escalation from SIEM/FIM.
+* [ ] **2.5 Sandbox upload integration**: Limit `/api/v1/sandbox/status` query details to files matching active Case ID.
 
 ### 🟦 Phase 4: Advanced Modules (Threat Hunting & Jupyter)
 *Goal: Deploy advanced detection, notebooks, and hunt escalation.*
@@ -109,6 +111,14 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 
 ## 🧭 Project Status History & Milestones
 
+* **2026-07-19**:
+  * Corrected backend configuration for TheHive, updating `.env` keys (`THEHIVE_API_KEY`) and pointing host queries to internal VM private IP (`10.0.0.4:9003`).
+  * Implemented backend routes (`GET /api/v1/case/list` and `POST /api/v1/case/create`) mapping cases and creating entries dynamically on TheHive.
+  * Overhauled Case Management dashboard, substituting mock case data with live data fetched directly from TheHive 5.
+  * Dynamically mapped cases onto Kanban board columns (`New`, `Triage`, `Investigation`, `Containment`, `Resolved`) and recalculated workload allocations and severity counts.
+  * Overhauled SOAR Playbook visualizer to fetch real workflows from Shuffle API, formatting action blocks dynamically for ReactFlow.
+  * Implemented detailed Manual Playbook trigger modal in the SOAR UI, supporting target agent selection, IP inputs, and severity indicators.
+  * Restricted HIL approvals queue to show items ONLY after the analyst triages and escalates an incident from SIEM/FIM.
 * **2026-07-16**:
   * Cloned the `CySA-Atlas` frontend/backend monorepo onto the Azure VM (`/opt/CySA-Atlas`).
   * Built and deployed the platform containers (Next.js frontend, NestJS backend, and PostgreSQL database) directly on the VM.
