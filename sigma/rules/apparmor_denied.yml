@@ -1,0 +1,13 @@
+title: AppArmor Execution Blocked
+id: apparmor_denied
+status: experimental
+description: Detects Apparmor DENIED messages in auditd / syslog
+logsource:
+  product: linux
+detection:
+  selection:
+    rule.groups: apparmor
+  condition: selection
+level: medium
+tags:
+  - attack.execution

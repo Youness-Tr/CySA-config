@@ -1,0 +1,14 @@
+title: Successful Sudo to Root Privilege Escalation
+id: sudo_root_execution
+status: experimental
+description: Detects successful transitions to root using sudo
+logsource:
+  product: linux
+detection:
+  selection:
+    rule.groups: sudo
+    rule.id: 5402
+  condition: selection
+level: medium
+tags:
+  - attack.privilege_escalation

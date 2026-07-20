@@ -99,7 +99,7 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 *Goal: Deploy advanced detection, notebooks, and hunt escalation.*
 * [x] **4.1 Deploy Jupyter Workbench**: Spun up `jupyter-workbench` container on port `:8888` (token: `cysa-atlas-hunt`).
 * [x] **4.2 Import Sigma Rules**: Created rules repository `/opt/CySA-config/sigma/rules/` with lateral movement, defense evasion, and persistence detections.
-* [ ] **4.3 Configure NestJS Hunting API**: Implement `/api/v1/hunting/*` rules list, OpenSearch converter, and escalation logic.
+* [x] **4.3 Configure NestJS Hunting API**: Implemented `/api/v1/hunting/*` rules list, OpenSearch converter, and Tenzir pipeline search queries.
 
 ### 🟪 Phase 5: Digital Forensics & Incident Response (Velociraptor DFIR)
 *Goal: Deploy endpoint forensics, query engine, and auto-hunt triggers.*
@@ -111,6 +111,14 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 
 ## 🧭 Project Status History & Milestones
 
+* **2026-07-20**:
+  * Redesigned Threat Hunting console into a responsive 3-column Single Pane of Glass dashboard.
+  * Added live MISP Threat Intel Feed and interactive MITRE Tactics coverage widget (blue/purple/rose themed, green color completely removed).
+  * Added an inline guide explaining how the Universal Sigma Rule Builder compiles detection parameters to query the raw indices via the Tenzir pipeline.
+  * Added a time range query selector (24h/7d/30d/90d) defaulting to "Last 30 Days" to allow immediate retrieval of historical logs.
+  * Configured docker-compose volume mounts to pass host-level `/opt/CySA-config` rules directly into `cysa-atlas-backend-1` container in read-only mode.
+  * Created Linux-based Sigma rules (`apparmor_denied.yml`, `sudo_root_execution.yml`, `vulnerability_detected.yml`) and verified live index queries directly against Wazuh/OpenSearch indexer (fetched 30 AppArmor logs and 3,181 Vulnerability alerts successfully).
+  * Overhauled right panel recommendation console to "AI Recommendations (future Agent)" showcasing Wazuh XML alerts, fast firewall block commands, and Shuffle SOAR Playbook hooks.
 * **2026-07-19**:
   * Corrected backend configuration for TheHive, updating `.env` keys (`THEHIVE_API_KEY`) and pointing host queries to internal VM private IP (`10.0.0.4:9003`).
   * Implemented backend routes (`GET /api/v1/case/list` and `POST /api/v1/case/create`) mapping cases and creating entries dynamically on TheHive.
