@@ -113,7 +113,8 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 
 * **2026-07-20**:
   * Redesigned Threat Hunting console into a responsive 3-column Single Pane of Glass dashboard.
-  * Added live MISP Threat Intel Feed and interactive MITRE Tactics coverage widget (blue/purple/rose themed, green color completely removed).
+  * Integrated CISA's official live Known Exploited Vulnerabilities (KEV) JSON feed into the MISP sidebar to track real-world emerging threat TTPs (e.g. CVE-2026-58644).
+  * Added an interactive MITRE Tactics coverage widget (blue/purple/rose themed, green color completely removed).
   * Added an inline guide explaining how the Universal Sigma Rule Builder compiles detection parameters to query the raw indices via the Tenzir pipeline.
   * Added a time range query selector (24h/7d/30d/90d) defaulting to "Last 30 Days" to allow immediate retrieval of historical logs.
   * Configured docker-compose volume mounts to pass host-level `/opt/CySA-config` rules directly into `cysa-atlas-backend-1` container in read-only mode.
