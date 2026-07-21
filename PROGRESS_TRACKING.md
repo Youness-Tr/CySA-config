@@ -105,13 +105,16 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 *Goal: Deploy endpoint forensics, query engine, and auto-hunt triggers.*
 * [x] **5.1 Deploy Velociraptor Server**: Spun up custom self-initializing `velociraptor` container on ports `8889` (GUI) and `8001` (Agent port).
 * [x] **5.2 Write VQL hunting integrations**: Store basic Velociraptor Query Language (VQL) scripts for host artifact collection.
-* [ ] **5.3 Configure NestJS Forensics API**: Implement endpoints to launch forensic hunts and query results.
+* [x] **5.3 Configure NestJS Forensics API**: Implement endpoints to launch forensic hunts, pull process trees, network state, user accounts, and query results via VQL proxy bridge.
 
 ---
 
 ## 🧭 Project Status History & Milestones
 
-* **2026-07-20**:
+* **2026-07-21**:
+  * Created Python VQL Proxy (`vql_proxy.py`) running as a systemd service (`vql-proxy.service`) on host port `4100`, bridging NestJS backend calls to the running `velociraptor` Docker container via mTLS/API client config.
+  * Added live digital forensics endpoints in NestJS backend (`GET /api/v1/forensics/clients`, `/processes`, `/netstat`, `/users`, `POST /hunt`, `POST /escalate-hunt`).
+  * Redesigned `DigitalForensics.tsx` into a Tier 3 DFIR console with live agent status, process tree table with memory & root privilege flags, network state matrix with external connection risk badges, system users table, evidence inspector drawer, and an interactive VQL query console with presets.
   * Redesigned Threat Hunting console into a responsive 3-column Single Pane of Glass dashboard.
   * Integrated CISA's official live Known Exploited Vulnerabilities (KEV) JSON feed into the MISP sidebar to track real-world emerging threat TTPs (e.g. CVE-2026-58644).
   * Added an interactive MITRE Tactics coverage widget (blue/purple/rose themed, green color completely removed).
