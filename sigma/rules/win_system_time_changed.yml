@@ -1,0 +1,15 @@
+title: Windows System Time Modified (Timestomping)
+id: win_system_time_changed
+status: production
+description: Detects system time modifications (Event ID 4616) indicative of timestomping or event log evasion.
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    data.win.system.eventID: '4616'
+  condition: selection
+level: medium
+tags:
+  - attack.defense_evasion
+  - attack.t1070.006

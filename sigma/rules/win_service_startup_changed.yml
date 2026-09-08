@@ -1,0 +1,15 @@
+title: Windows Service Startup Type Modified
+id: win_service_startup_changed
+status: production
+description: Detects changes to the startup type of a Windows service (Event ID 7040 / sc.exe config changes) which may indicate persistence.
+logsource:
+  product: windows
+  service: system
+detection:
+  selection:
+    data.win.system.eventID: '7040'
+  condition: selection
+level: medium
+tags:
+  - attack.persistence
+  - attack.t1543.003

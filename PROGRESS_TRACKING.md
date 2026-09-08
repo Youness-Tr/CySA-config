@@ -111,6 +111,13 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
 
 ## 🧭 Project Status History & Milestones
 
+* **2026-09-08**:
+  * Threat Intelligence Engine: Live external CISA KEV JSON feed ingestion with in-memory TTL caching, internal OpenSearch telemetry IoC cross-matching (`POST /api/v1/intel/lookup`), actionable blocking, host isolation, and case creation endpoints.
+  * Threat Hunting Pivot Workflow: Seamless navigation from Threat Intel indicators into Threat Hunting with pre-filled ad-hoc scan parameters, dynamic MITRE technique mapping, and AI copilot prompt chips.
+  * Digital Forensics Module: Client-scoped VQL routing against enrolled Velociraptor endpoints (`Windows.System.Pslist`, `Windows.Network.Netstat`, `Generic.Client.Info/Users`), top-level endpoint selector, dynamic VQL console scope, programmatic JSON artifact export in Evidence Inspector, and live firewall blocking with loading states and badge feedback.
+* **2026-09-07**:
+  * Cross-Module Escalation Status Synchronization: Connected Threat Hunting findings and Digital Forensics artifacts to the Case Management service, adding visual `Escalated to Case #...` status badges to prevent duplicate manual case creation.
+  * Comprehensive Authentication & Session Management Architectural Audit: Conducted full codebase audit verifying 100% Local Authentication & Authorization architecture (`users` table, salted bcrypt, local `@nestjs/jwt` HS256, 24h expiration, dynamic JIT tier elevation, frontend `localStorage` bearer token injection) and developed the migration blueprint for Keycloak SSO (OIDC Authorization Code Flow with PKCE, RS256/JWKS verification).
 * **2026-07-21**:
   * Created Python VQL Proxy (`vql_proxy.py`) running as a systemd service (`vql-proxy.service`) on host port `4100`, bridging NestJS backend calls to the running `velociraptor` Docker container via mTLS/API client config.
   * Added live digital forensics endpoints in NestJS backend (`GET /api/v1/forensics/clients`, `/processes`, `/netstat`, `/users`, `POST /hunt`, `POST /escalate-hunt`).

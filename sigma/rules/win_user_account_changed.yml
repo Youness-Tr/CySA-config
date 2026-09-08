@@ -1,0 +1,20 @@
+title: Windows User Account Manipulation
+id: win_user_account_changed
+status: production
+description: Detects creation, enabling, password reset, or modification of Windows user accounts (Event IDs 4720, 4722, 4724, 4728, 4738).
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    data.win.system.eventID:
+      - '4720'
+      - '4722'
+      - '4724'
+      - '4728'
+      - '4738'
+  condition: selection
+level: high
+tags:
+  - attack.persistence
+  - attack.t1098

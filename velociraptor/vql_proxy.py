@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 VELOCIRAPTOR_CONTAINER = "velociraptor"
 VELOCIRAPTOR_BIN = "/usr/local/bin/velociraptor"
-VELOCIRAPTOR_API_CONFIG = "/tmp/api_client.yaml"
+VELOCIRAPTOR_API_CONFIG = "/velociraptor/config/api_client.yaml"
 
 # Safe VQL queries we allow (whitelist)
 ALLOWED_PREFIXES = [
