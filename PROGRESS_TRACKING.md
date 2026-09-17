@@ -117,7 +117,50 @@ The diagram below outlines how logs, enrichments, and human approvals route thro
   * Digital Forensics Module: Client-scoped VQL routing against enrolled Velociraptor endpoints (`Windows.System.Pslist`, `Windows.Network.Netstat`, `Generic.Client.Info/Users`), top-level endpoint selector, dynamic VQL console scope, programmatic JSON artifact export in Evidence Inspector, and live firewall blocking with loading states and badge feedback.
 * **2026-09-07**:
   * Cross-Module Escalation Status Synchronization: Connected Threat Hunting findings and Digital Forensics artifacts to the Case Management service, adding visual `Escalated to Case #...` status badges to prevent duplicate manual case creation.
-  * Comprehensive Authentication & Session Management Architectural Audit: Conducted full codebase audit verifying 100% Local Authentication & Authorization architecture (`users` table, salted bcrypt, local `@nestjs/jwt` HS256, 24h expiration, dynamic JIT tier elevation, frontend `localStorage` bearer token injection) and developed the migration blueprint for Keycloak SSO (OIDC Authorization Code Flow with PKCE, RS256/JWKS verification).
+* **2026-09-17**:
+  * **Network Security Action Drawer Deep Forensics Overhaul**:
+    * Implemented dedicated multi-tab Tier 1/2 SOC inspector in `Network.tsx`:
+      * **Forensics Tab**: Ingress interface (`vtnet0` on WAN vs `vtnet1` on LAN), Sensor Gateway, Suricata Flow ID, Wazuh Rule Correlation, and Session Flow telemetry (Packets To Server / To Client, Bytes transferred).
+      * **HTTP Request Tab**: Request method (`GET`/`POST`), target URI path (`/generate_204...` or `/nmaplowercheck`), HTTP protocol version (`HTTP/1.1`), and full User-Agent string (`Go-http-client/1.1`, `Nmap Scripting Engine`, etc.).
+      * **Raw EVE JSON Tab**: Syntax-highlighted `<pre>` view of full OpenSearch source document with one-click "Copy JSON" button for DFIR handoff.
+    * Added socket connection matrix (`src_ip:port` ➔ `dest_ip:port`) and probe repetition counter badge (`⚡ Fired X× Probes`).
+    * Fixed NestJS backend `getAlertById` to query OpenSearch via `POST /wazuh-alerts-*/_search` with an `ids` query filter, allowing reliable lookup of alerts whose document IDs begin with dashes or special characters.
+  * **Alert Repetition Analysis & Table Probe Indicator**:
+    * Identified root cause of repeated Nmap alerts: Nmap probes (`-sC`, `-sV`, service detection) spawn dozens of parallel TCP/HTTP sockets from separate ephemeral ports in milliseconds. Suricata evaluates each flow individually and generates an alert per probe.
+    * Exposed Wazuh's aggregation counter (`rule.firedtimes`) on the frontend alerts table as a visual badge (`×{firedtimes}`) and explained probe behavior in the table header.
+  * **Network Topology Beta Mode Flagged**:
+    * Marked the "CySA Platform Network Topology" component with an explicit `[ BETA • Reference Model ]` badge.
+    * Added descriptive subtitle clarifying that it represents the baseline architectural reference diagram for the active GNS3 Cyber Lab, with automated dynamic discovery (LLDP/SNMP) under development.
+  * **Lab VM IP Migration & OPNsense WAN Rule Diagnostics**:
+    * Documented VM dynamic IP allocation changes after reboot (`Kali: 192.168.122.170`, `OPNsense WAN: 192.168.122.89`, `OPNsense LAN: 192.168.1.1`, `Victim: 192.168.1.101`).
+    * Resolved initial 100% packet loss by tuning OPNsense WAN firewall rules to permit inbound ICMP/TCP scan traffic from the Kali subnet.
+* **2026-09-16**:
+  * **Azure NSG & Inbound Syslog Verified**:
+    * Verified Azure Network Security Group allows UDP port 514 inbound from user's cyber lab IP (`197.230.122.195`).
+    * Packet captures (`tcpdump -nn -i any udp port 514`) confirm packets are actively arriving on `eth0` (`10.0.0.4:514`) and forwarded to `single-node-wazuh.manager-1` (`172.19.0.4:514`).
+  * **Suricata Syslog Decoder Implemented**:
+    * Added custom syslog JSON decoder in `/var/ossec/etc/decoders/local_decoder.xml` (and saved to `/opt/CySA-config/wazuh-docker/single-node/config/decoders/local_decoder.xml`) matching `program_name: suricata` and invoking `JSON_Decoder`.
+    * Tested and verified in `wazuh-logtest`: syslog-wrapped Suricata events successfully decode and trigger rule `86601` (`ids, suricata`).
+    * Rebuilt frontend and backend containers (`--no-cache`) and restarted them. Verified test alerts appear immediately in `/api/v1/ndr/alerts` and the Network Security UI.
+  * **OPNsense Suricata Telemetry Alignment**:
+    * Observed arriving packets are currently OPNsense firewall filter logs (`filterlog[51394]`).
+    * Next step: Enable "Send alerts to system log" in OPNsense (**Services ➔ Intrusion Detection ➔ Administration**) so Suricata forwards NIDS alert payloads.
+* **2026-09-15**:
+  * **FIM & CVE Workflows Re-activated**:
+    * Enabled CSV "Export Report" (`exportToCSV`) in `IntegrityMonitor.tsx` and `Vulnerabilities.tsx`.
+    * Implemented FIM "Approve Change" workflow (`PATCH /api/v1/fim/events/:id/status`) with optimistic state updates and `text-cyan-400` styling.
+    * Implemented CVE "Accept Risk" workflow (`PATCH /api/v1/wazuh/vulnerabilities/:id/status`) with persistent state overrides.
+  * **NDR Data Pollution & Strict Suricata Ingestion Fixed**:
+    * Updated OpenSearch boolean query in `ndr.service.ts` to strictly require Suricata/NIDS rule groups and fields (`suricata`, `ids`, `data.alert.signature`, `data.suricata.eve.event_type: alert`) and explicitly deny generic Windows event channels, Syscheck, and OSSEC logs.
+    * Updated `normalizeNdrHit` and frontend `Network.tsx` with dedicated helpers (`getAlertSrcIp`, `getAlertDestIp`, `getAlertSignature`) to extract nested Suricata fields and purge `0.0.0.0` records.
+    * Replaced static mock Top Talkers & Protocols with live OpenSearch aggregations and dynamic correlation from active Suricata alert telemetry.
+  * **Wazuh Manager Syslog Listener (UDP 514) Activated**:
+    * Fixed missing `<remote>` syslog configuration: added `<connection>syslog</connection><port>514</port><protocol>udp</protocol>` to `wazuh_manager.conf` and `/var/ossec/etc/ossec.conf`.
+    * Restarted `wazuh-remoted` and verified socket `0.0.0.0:514` (UDP) is bound and listening.
+    * Verified end-to-end ingestion: test Suricata EVE JSON syslog decoded under rule `86601` (`ids, suricata`), indexed to OpenSearch, and rendered live in the CySA Atlas NDR dashboard.
+  * **Session Checkpoint & Resumption Point for Tomorrow**:
+    * User updated OPNsense remote syslog destination to `20.91.141.211:514` (Public Azure IP).
+    * Pending for tomorrow: Verify packet path from OPNsense WAN to Azure UDP 514 (check Azure Network Security Group (NSG) inbound rules for UDP port 514), or configure Tailscale directly on OPNsense via `os-tailscale` plugin to route syslog over the authenticated VPN tunnel to `100.100.187.90:514`.
 * **2026-07-21**:
   * Created Python VQL Proxy (`vql_proxy.py`) running as a systemd service (`vql-proxy.service`) on host port `4100`, bridging NestJS backend calls to the running `velociraptor` Docker container via mTLS/API client config.
   * Added live digital forensics endpoints in NestJS backend (`GET /api/v1/forensics/clients`, `/processes`, `/netstat`, `/users`, `POST /hunt`, `POST /escalate-hunt`).

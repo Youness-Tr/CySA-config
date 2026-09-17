@@ -1,0 +1,6 @@
+<!-- Local Decoders for CySA-Atlas -->
+<!-- Support Suricata JSON over Syslog -->
+<decoder name="json">
+  <program_name>^suricata</program_name>
+  <plugin_decoder>JSON_Decoder</plugin_decoder>
+</decoder>
